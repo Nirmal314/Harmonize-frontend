@@ -1,13 +1,7 @@
 import React, { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  MoreHorizontal,
-  User,
-  Wand2,
-  Music4,
-  ExternalLink,
-} from "lucide-react";
+import { MoreHorizontal, User, Music4, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +28,7 @@ import {
 import DummyCover from "@/public/dummy-cover.jpg";
 import { Playlist } from "@/typings";
 import PlaylistLoadingCard from "./loading/PlaylistLoadingCard";
+import CategorizeButton from "./CategorizeButton";
 
 const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
   return (
@@ -126,10 +121,7 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
               Open in Spotify
             </Link>
           </Button>
-          <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-            <Wand2 className="mr-3 h-4 w-4" />
-            Categorize
-          </Button>
+          <CategorizeButton playlistId={playlist.id} />
         </div>
       </CardFooter>
     </Card>
