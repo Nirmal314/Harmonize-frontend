@@ -14,6 +14,7 @@ const scopes = [
   "playlist-modify-public", //! Write access to a user's public playlists.
   "user-library-modify", //! Write/delete access to a user's "Your Music" library.
   "user-library-read", //! 	Read access to a user's library.
+  "user-follow-read", //! Read access to the list of artists and other users that the user follows.
 ].join(",");
 
 const params = {
@@ -25,8 +26,8 @@ const queryParams = new URLSearchParams(params);
 const LOGIN_URL = `https://accounts.spotify.com/authorize?${queryParams.toString()}`;
 
 const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_ID! as string,
-  clientSecret: process.env.SPOTIFY_SECRET! as string,
+  clientId: process.env.NEXT_PUBLIC_SPOTIFY_ID,
+  clientSecret: process.env.NEXT_PUBLIC_SPOTIFY_SECRET,
 });
 
 export default spotifyApi;

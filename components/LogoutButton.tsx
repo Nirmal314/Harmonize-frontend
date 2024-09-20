@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 
 export default function LogoutButton() {
@@ -6,12 +7,5 @@ export default function LogoutButton() {
     await signOut({ callbackUrl: "/login" });
   };
 
-  return (
-    <button
-      className="p-5 bg-spotify text-white rounded-full"
-      onClick={handleSignout}
-    >
-      Logout
-    </button>
-  );
+  return <Button onClick={handleSignout}>Logout</Button>;
 }

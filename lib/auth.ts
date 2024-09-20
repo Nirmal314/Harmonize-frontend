@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import spotifyApi, { LOGIN_URL } from "./spotify";
 import { JWT } from "next-auth/jwt";
@@ -70,11 +70,8 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      // @ts-ignore
       session.user!.accessToken = (token as Token).accessToken;
-      // @ts-ignore
       session.user!.refreshToken = (token as Token).refreshToken;
-      // @ts-ignore
       session.user!.username = (token as Token).username;
 
       return session;
