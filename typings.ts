@@ -25,3 +25,11 @@ export type Playlist = {
   followers: number;
   collaborative: boolean;
 };
+
+export type InputSongAudioFeatures = {
+  danceability: number;
+  energy: number;
+  acousticness: number;
+  valence: number;
+  tempo: number;
+};

@@ -1,21 +1,14 @@
 "use server";
 
+import { InputSongAudioFeatures } from "@/typings";
 import { revalidatePath } from "next/cache";
-
-export type SongAudioFeatures = {
-  danceability: number;
-  energy: number;
-  acousticness: number;
-  valence: number;
-  tempo: number;
-};
 
 type PredictionResult = {
   predicted_category: string;
 };
 
 export async function predictSongCategory(
-  input: SongAudioFeatures
+  input: InputSongAudioFeatures
 ): Promise<PredictionResult> {
   const apiUrl = `${process.env.MODEL_API_URL}/predict`;
 
