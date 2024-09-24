@@ -6,6 +6,8 @@ import { Wand2 } from "lucide-react";
 import useSpotify from "@/hooks/useSpotify";
 import { predictSongCategory } from "@/actions/categorize";
 
+type Category = "happy" | "sad" | "energetic" | "calm" | "confident";
+
 const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
   const spotifyApi = useSpotify();
 
@@ -13,32 +15,42 @@ const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
     const selectedPlaylist = await spotifyApi.getPlaylist(playlistId);
     const tracks = selectedPlaylist.body.tracks.items;
 
-    const tracksWithCategories = [];
+    const trackIds = tracks
+      .map((track) => track.track?.id)
+      .filter((id): id is string => !!id);
 
-    for (const track of tracks) {
-      const trackId = track.track?.id!;
+    const audioFeaturesResponse = await spotifyApi.getAudioFeaturesForTracks(
+      trackIds
+    );
+    const { audio_features } = audioFeaturesResponse.body;
 
-      const {
-        body: { danceability, acousticness, valence, tempo, energy },
-      } = await spotifyApi.getAudioFeaturesForTrack(trackId);
+    const categorizedTracks: Record<Category, typeof tracks> = {
+      happy: [],
+      sad: [],
+      energetic: [],
+      calm: [],
+      confident: [],
+    };
 
-      const result = await predictSongCategory({
-        danceability,
-        acousticness,
-        valence,
-        tempo,
-        energy,
-      });
+    await Promise.all(
+      tracks.map(async (track, index) => {
+        const features = audio_features[index];
+        const { danceability, acousticness, valence, tempo, energy } = features;
 
-      const trackJson = {
-        ...track,
-        category: result.predicted_category,
-      };
+        const result = await predictSongCategory({
+          danceability,
+          acousticness,
+          valence,
+          tempo,
+          energy,
+        });
 
-      tracksWithCategories.push(trackJson);
-    }
+        const category = result.predicted_category as Category;
+        categorizedTracks[category]?.push(track);
+      })
+    );
 
-    console.log(tracksWithCategories);
+    console.log(categorizedTracks);
     // TODO: proceed from here
   };
 
