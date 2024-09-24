@@ -1,93 +1,72 @@
-"use client";
-
-import React from "react";
+import React, { useTransition } from "react";
 import { Button } from "./ui/button";
 import { Wand2 } from "lucide-react";
 import useSpotify from "@/hooks/useSpotify";
 import { predictSongCategory } from "@/actions/categorize";
+import { useRouter } from "next/navigation";
+import { Category, Song, TrackWithCategory } from "@/typings";
+import { navigateWithTracks } from "@/actions/tracks";
 
-type Category =
-  | "happy"
-  | "sad"
-  | "energetic"
-  | "calm"
-  | "confident"
-  | "instrumental";
+const msToMinutesAndSeconds = (ms: number) => {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = ((ms % 60000) / 1000).toFixed(0);
+  return `${minutes}:${seconds.padStart(2, "0")}`;
+};
 
 const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
   const spotifyApi = useSpotify();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const categorize = async (playlistId: string) => {
     const selectedPlaylist = await spotifyApi.getPlaylist(playlistId);
     const tracks = selectedPlaylist.body.tracks.items;
 
-    const trackIds = tracks
-      .map((track) => track.track?.id)
-      .filter((id): id is string => !!id);
+    const songs: Song[] = [];
 
-    const audioFeaturesResponse = await spotifyApi.getAudioFeaturesForTracks(
-      trackIds
-    );
-    const { audio_features } = audioFeaturesResponse.body;
+    for (const track of tracks) {
+      const trackId = track.track?.id!;
 
-    const categorizedTracks: Record<Category, typeof tracks> = {
-      happy: [],
-      sad: [],
-      energetic: [],
-      calm: [],
-      confident: [],
-      instrumental: [],
-    };
+      const {
+        body: { danceability, acousticness, valence, tempo, energy },
+      } = await spotifyApi.getAudioFeaturesForTrack(trackId);
 
-    await Promise.all(
-      tracks.map(async (track, index) => {
-        const features = audio_features[index];
-        const {
-          danceability,
-          acousticness,
-          valence,
-          tempo,
-          energy,
-          instrumentalness,
-        } = features;
+      const result = await predictSongCategory({
+        danceability,
+        acousticness,
+        valence,
+        tempo,
+        energy,
+      });
 
-        if (instrumentalness > 0.4) {
-          categorizedTracks["instrumental"]?.push(track);
-        } else {
-          const result = await predictSongCategory({
-            danceability,
-            acousticness,
-            valence,
-            tempo,
-            energy,
-          });
+      const song: Song = {
+        image: track.track?.album.images[0].url || "",
+        name: track.track?.name || "",
+        artist:
+          track.track?.artists.map((artist) => artist.name).join(", ") || "",
+        album: track.track?.album.name || "",
+        duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
+        category: result.predicted_category as Song["category"],
+      };
 
-          console.log({
-            danceability,
-            acousticness,
-            valence,
-            tempo,
-            energy,
-            instrumentalness,
-          });
+      songs.push(song);
+    }
 
-          const category = result.predicted_category as Category;
-          categorizedTracks[category]?.push(track);
-        }
-      })
-    );
-
-    console.log(categorizedTracks);
-    // TODO: proceed from here
+    startTransition(() => {
+      navigateWithTracks(songs).then(() => {
+        router.push("/categorized-songs");
+      });
+    });
   };
 
   return (
     <Button
       className="w-full bg-purple-600 hover:bg-purple-700 text-white"
       onClick={() => categorize(playlistId)}
+      disabled={isPending}
     >
       <Wand2 className="mr-3 h-4 w-4" />
-      Categorize
+      {isPending ? "Categorizing..." : "Categorize"}
     </Button>
   );
 };

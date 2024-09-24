@@ -33,3 +33,31 @@ export type InputSongAudioFeatures = {
   valence: number;
   tempo: number;
 };
+
+export type Song = {
+  image: string;
+  name: string;
+  artist: string;
+  album: string;
+  duration: string;
+  category:
+    | "Happy"
+    | "Sad"
+    | "Calm"
+    | "Energetic"
+    | "Confident"
+    | "Instrumental";
+};
+
+export type Category =
+  | "happy"
+  | "sad"
+  | "energetic"
+  | "calm"
+  | "confident"
+  | "instrumental";
+
+export type TrackWithCategory = {
+  track: SpotifyApi.TrackObjectFull;
+  category: Category;
+};

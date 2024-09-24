@@ -14,6 +14,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'wrapped-images.spotifycdn.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'developers.elementor.com',
+            },
         ],
     },
 };
