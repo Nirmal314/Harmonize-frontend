@@ -6,7 +6,13 @@ import { Wand2 } from "lucide-react";
 import useSpotify from "@/hooks/useSpotify";
 import { predictSongCategory } from "@/actions/categorize";
 
-type Category = "happy" | "sad" | "energetic" | "calm" | "confident";
+type Category =
+  | "happy"
+  | "sad"
+  | "energetic"
+  | "calm"
+  | "confident"
+  | "instrumental";
 
 const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
   const spotifyApi = useSpotify();
@@ -30,23 +36,44 @@ const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
       energetic: [],
       calm: [],
       confident: [],
+      instrumental: [],
     };
 
     await Promise.all(
       tracks.map(async (track, index) => {
         const features = audio_features[index];
-        const { danceability, acousticness, valence, tempo, energy } = features;
-
-        const result = await predictSongCategory({
+        const {
           danceability,
           acousticness,
           valence,
           tempo,
           energy,
-        });
+          instrumentalness,
+        } = features;
 
-        const category = result.predicted_category as Category;
-        categorizedTracks[category]?.push(track);
+        if (instrumentalness > 0.4) {
+          categorizedTracks["instrumental"]?.push(track);
+        } else {
+          const result = await predictSongCategory({
+            danceability,
+            acousticness,
+            valence,
+            tempo,
+            energy,
+          });
+
+          console.log({
+            danceability,
+            acousticness,
+            valence,
+            tempo,
+            energy,
+            instrumentalness,
+          });
+
+          const category = result.predicted_category as Category;
+          categorizedTracks[category]?.push(track);
+        }
       })
     );
 
