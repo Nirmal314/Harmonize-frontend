@@ -1,6 +1,6 @@
 "use client";
 
-import SpotifyPlaylists from "@/components/SpotifyPlaylists";
+import SpotifyPlaylists from "@/app/(components)/SpotifyPlaylists";
 import useSpotify from "@/hooks/useSpotify";
 import { Playlist, SpotifyPlaylist } from "@/typings";
 import { useSession } from "next-auth/react";

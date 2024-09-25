@@ -1,8 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "../ui/button";
 import { ArrowUpDown } from "lucide-react";
 import Image from "next/image";
 import { Song } from "@/typings";
+import { Button } from "@/components/ui/button";
 
 const getCategoryColor = (category: string) => {
   switch (category.toUpperCase()) {

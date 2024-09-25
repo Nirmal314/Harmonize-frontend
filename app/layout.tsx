@@ -1,9 +1,7 @@
-"use client";
-
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
+import Provider from "./(components)/Provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,10 +14,10 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-// export const metadata: Metadata = {
-//   title: "Harmonize",
-//   description: "Categorize your spotify playlist",
-// };
+export const metadata: Metadata = {
+  title: "Harmonize",
+  description: "Categorize your spotify playlist",
+};
 
 export default function RootLayout({
   children,
@@ -27,14 +25,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
-      </html>
-    </SessionProvider>
+    <html lang="en" suppressHydrationWarning={true}>
+      <body
+        suppressHydrationWarning={true}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Provider>{children}</Provider>
+      </body>
+    </html>
   );
 }

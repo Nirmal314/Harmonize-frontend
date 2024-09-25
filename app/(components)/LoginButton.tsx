@@ -4,7 +4,6 @@ import { signIn } from "next-auth/react";
 
 export default function LoginButton() {
   const handleSignin = async () => {
-    console.log("first");
     await signIn("spotify", {
       callbackUrl: "/",
     });

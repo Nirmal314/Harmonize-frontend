@@ -1,5 +1,5 @@
 import React from "react";
-import LoginButton from "@/components/LoginButton";
+import LoginButton from "@/app/(components)/LoginButton";
 import SpotifyLogo from "@/public/spotify.png";
 import Image from "next/image";
 const Login = () => {

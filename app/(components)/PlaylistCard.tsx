@@ -1,4 +1,3 @@
-import React, { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MoreHorizontal, User, Music4, ExternalLink } from "lucide-react";
@@ -27,8 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 import DummyCover from "@/public/dummy-cover.jpg";
 import { Playlist } from "@/typings";
-import PlaylistLoadingCard from "./loading/PlaylistLoadingCard";
-import CategorizeButton from "./CategorizeButton";
+import Categorize from "./Categorize";
 
 const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
   return (
@@ -121,28 +119,11 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
               Open in Spotify
             </Link>
           </Button>
-          <CategorizeButton playlistId={playlist.id} />
+          <Categorize playlistId={playlist.id} />
         </div>
       </CardFooter>
     </Card>
   );
 };
 
-const SpotifyPlaylists = ({ playlists }: { playlists: Playlist[] }) => {
-  return (
-    <div className="w-full mx-auto p-4 bg-black text-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 text-gray-100">
-        Your Spotify Playlists
-      </h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {playlists.map((playlist: Playlist) => (
-          <Suspense key={playlist.id} fallback={<PlaylistLoadingCard />}>
-            <PlaylistCard playlist={playlist} />
-          </Suspense>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-export default SpotifyPlaylists;
+export default PlaylistCard;
