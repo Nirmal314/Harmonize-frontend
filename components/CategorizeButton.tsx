@@ -22,40 +22,69 @@ const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
     const selectedPlaylist = await spotifyApi.getPlaylist(playlistId);
     const tracks = selectedPlaylist.body.tracks.items;
 
-    const songs: Song[] = [];
+    const trackIds = tracks.map((track) => track.track?.id!).filter(Boolean);
 
-    for (const track of tracks) {
-      const trackId = track.track?.id!;
+    const audioFeaturesResponses = await Promise.all(
+      trackIds.map((trackId) => spotifyApi.getAudioFeaturesForTrack(trackId))
+    );
 
+    const predictions = await Promise.all(
+      audioFeaturesResponses.map(
+        ({
+          body: {
+            danceability,
+            acousticness,
+            valence,
+            tempo,
+            energy,
+            instrumentalness,
+          },
+        }) => {
+          if (instrumentalness > 0.6) {
+            return { predicted_category: "instrumental" };
+          }
+
+          return predictSongCategory({
+            danceability,
+            acousticness,
+            valence,
+            tempo,
+            energy,
+          });
+        }
+      )
+    );
+
+    const songs: Song[] = tracks.map((track, index) => {
       const {
-        body: { danceability, acousticness, valence, tempo, energy },
-      } = await spotifyApi.getAudioFeaturesForTrack(trackId);
+        name = "",
+        artists = [],
+        album = { name: "" },
+        duration_ms = 0,
+      } = track.track || {};
 
-      const result = await predictSongCategory({
-        danceability,
-        acousticness,
-        valence,
-        tempo,
-        energy,
-      });
-
-      const song: Song = {
+      return {
         image: track.track?.album.images[0].url || "",
-        name: track.track?.name || "",
-        artist:
-          track.track?.artists.map((artist) => artist.name).join(", ") || "",
-        album: track.track?.album.name || "",
-        duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
-        category: result.predicted_category as Song["category"],
+        name: name,
+        artist: artists.map((artist) => artist.name).join(", ") || "",
+        album: album.name,
+        duration: msToMinutesAndSeconds(duration_ms),
+        category: predictions[index].predicted_category as Song["category"],
       };
-
-      songs.push(song);
-    }
+    });
 
     startTransition(() => {
-      navigateWithTracks(songs).then(() => {
-        router.push("/categorized-songs");
-      });
+      fetch(`http://localhost:3000/api/tracks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(songs),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === 200) router.push("/categorized-songs");
+        });
     });
   };
 

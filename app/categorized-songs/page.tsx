@@ -1,14 +1,28 @@
+"use client";
+
 import CategorizedSongs from "@/components/CategorizedSongsDT/CategorizedSongs";
 import CategorizedSongsDropdown from "@/components/CategorizedSongsDropdown";
 import CategorizedSongsTable from "@/components/CategorizedSongsTable";
 import { Song } from "@/typings";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const CategorizedSongsPage = async () => {
-  const response = await fetch("/api/tracks");
-  const songs: Song[] = await response.json();
+const CategorizedSongsPage = () => {
+  const [songs, setSongs] = useState<Song[]>([]);
 
-  console.log(songs);
+  useEffect(() => {
+    fetch("http://localhost:3000/api/tracks", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setSongs(data.tracks as Song[]);
+        console.log(data);
+      });
+  }, []);
+
   return (
     <>
       {/* <CategorizedSongsDropdown /> */}
