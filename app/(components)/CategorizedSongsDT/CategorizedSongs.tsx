@@ -61,6 +61,8 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
     },
   });
 
+  table.getState().pagination.pageSize = 7;
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -155,7 +157,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          className="bg-transparent border hover:bg-primary hover:text-black border-gray-700 "
+          className="bg-transparent border hover:border-primary hover:text-black border-gray-700 "
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -163,7 +165,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
           <span>Previous</span>
         </Button>
         <Button
-          className="bg-transparent border hover:bg-primary hover:text-black border-gray-700 "
+          className="bg-transparent border hover:border-primary hover:text-black border-gray-700 "
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

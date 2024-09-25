@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import LogoutButton from "@/components/LogoutButton";
+import LogoutButton from "@/app/(components)/LogoutButton";
 const Home = async () => {
   const session = await getServerSession(authOptions);
   return (

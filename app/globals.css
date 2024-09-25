@@ -6,6 +6,27 @@
   .bg-spotify {
     background-color: #18d860;
   }
+
+  .shadow-all {
+    animation: sh 4s ease-in-out infinite;
+  }
+  .shadow-card {
+    box-shadow: 0 0 40px rgba(24, 216, 96, 0.2);
+  }
+  .shadow-brightcard {
+    box-shadow: 0 0 80px rgba(24, 216, 96, 0.5);
+  }
+  @keyframes sh {
+    0% {
+      box-shadow: 0 0 40px rgba(24, 216, 96, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(24, 216, 96, 0.6);
+    }
+    100% {
+      box-shadow: 0 0 40px rgba(24, 216, 96, 0.3);
+    }
+  }
 }
 
 @layer base {
@@ -71,5 +92,15 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
