@@ -10,7 +10,7 @@ const CategorizedSongsPage = () => {
   const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/tracks", {
+    fetch(`${process.env.NEXT_PUBLIC_URL}/api/tracks`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +29,7 @@ const CategorizedSongsPage = () => {
       {/* <CategorizedSongsTable /> */}
       <div className="w-full mx-auto p-4 bg-black text-gray-100 min-h-screen">
         <h1 className="text-2xl font-bold mb-4 text-gray-100">
-          Your Spotify Playlists
+          Your songs with categories
         </h1>
         <CategorizedSongs songs={songs} />
       </div>

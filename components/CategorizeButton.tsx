@@ -74,7 +74,7 @@ const CategorizeButton = ({ playlistId }: { playlistId: string }) => {
     });
 
     startTransition(() => {
-      fetch(`http://localhost:3000/api/tracks`, {
+      fetch(`${process.env.NEXT_PUBLIC_URL}/api/tracks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

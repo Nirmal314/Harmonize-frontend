@@ -2,7 +2,7 @@
 import { Song } from "@/typings";
 
 export async function navigateWithTracks(tracks: Song[]) {
-  const res = await fetch(`http://localhost:3000/api/tracks`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tracks`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
