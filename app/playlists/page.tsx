@@ -3,11 +3,9 @@
 import SpotifyPlaylists from "@/app/(components)/SpotifyPlaylists";
 import useSpotify from "@/hooks/useSpotify";
 import { Playlist, SpotifyPlaylist } from "@/typings";
-import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
 const Playlists = () => {
-  const { data: session } = useSession();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const spotifyApi = useSpotify();
 
@@ -39,7 +37,7 @@ const Playlists = () => {
       );
       setPlaylists(formattedPlaylists);
     });
-  }, [session, spotifyApi]);
+  }, [spotifyApi]);
 
   return (
     <div>

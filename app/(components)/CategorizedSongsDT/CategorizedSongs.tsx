@@ -64,7 +64,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
   table.getState().pagination.pageSize = 7;
 
   return (
-    <div className="w-full">
+    <div className="w-full rounded-md py-2.5 px-4 md:py-8 md:px-14 shadow-[rgba(24,216,96,0.8)_0px_0px_15px_12px]">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter songs..."
@@ -72,7 +72,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm border-gray-700"
+          className="max-w-sm border-gray-700 mr-2"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -131,6 +131,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="group hover:bg-primary/[0.13]"
+                  onClick={() => window.open(row.original.url, "_blank")}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

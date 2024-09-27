@@ -3,8 +3,6 @@ import SpotifyWebApi from "spotify-web-api-node";
 const scopes = [
   "user-read-email", //! 	Read access to user’s email address.
   "user-read-private", //! Read access to user’s subscription details (type of user account).
-  "playlist-read-private",
-  "playlist-read-collaborative",
   // "user-read-playback-state", //! 	Read access to a user’s player state.
   // "user-modify-playback-state", //! 	Write access to a user’s playback state
   // "user-read-currently-playing" //! 	Read access to a user’s currently playing content.

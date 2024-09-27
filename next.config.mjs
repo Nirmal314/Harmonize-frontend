@@ -18,6 +18,18 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'developers.elementor.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'image-cdn-ak.spotifycdn.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'seed-mix-image.spotifycdn.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'image-cdn-fa.spotifycdn.com',
+            },
         ],
     },
 };

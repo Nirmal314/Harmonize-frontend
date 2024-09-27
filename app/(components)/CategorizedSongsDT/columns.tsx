@@ -55,10 +55,10 @@ export const columns: ColumnDef<Song, any>[] = [
           className="rounded-sm hover:shadow-md transition-shadow mr-2"
         />
         <div className="flex flex-col">
-          <div className="font-semibold group-hover:text-primary group-hover:underline cursor-pointer transition-colors">
+          <div className="text-nowrap font-semibold group-hover:text-primary group-hover:underline cursor-pointer transition-colors">
             {row.getValue("name")}
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-nowrap text-sm text-muted-foreground">
             {row.original.artist}
           </div>
         </div>
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Song, any>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("album")}</div>
+      <div className="capitalize text-nowrap">{row.getValue("album")}</div>
     ),
   },
   {

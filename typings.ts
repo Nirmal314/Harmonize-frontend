@@ -37,6 +37,7 @@ export type InputSongAudioFeatures = {
 export type Song = {
   image: string;
   name: string;
+  url: string;
   artist: string;
   album: string;
   duration: string;
