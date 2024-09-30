@@ -3,11 +3,14 @@
 import SpotifyPlaylists from "@/app/(components)/SpotifyPlaylists";
 import useSpotify from "@/hooks/useSpotify";
 import { Playlist, SpotifyPlaylist } from "@/typings";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Playlists = () => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const spotifyApi = useSpotify();
+  const router = useRouter();
 
   const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
     id: playlist.id,
@@ -21,7 +24,19 @@ const Playlists = () => {
   });
 
   useEffect(() => {
-    if (!spotifyApi.getAccessToken()) return;
+    console.log(spotifyApi.getAccessToken());
+
+    if (!spotifyApi.getAccessToken()) {
+      toast.error("No access token found, redirecting...");
+
+      setTimeout(() => {
+        router.push("/");
+      }, 4000);
+    }
+
+    // toast.success(
+    //   "api calls for /playlists: getUserPlaylists(), getPlaylist(playlist.id)"
+    // );
 
     spotifyApi.getUserPlaylists().then(async (data) => {
       const formattedPlaylists: Playlist[] = await Promise.all(
@@ -37,7 +52,7 @@ const Playlists = () => {
       );
       setPlaylists(formattedPlaylists);
     });
-  }, [spotifyApi]);
+  }, []);
 
   return (
     <div>

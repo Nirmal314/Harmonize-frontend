@@ -40,3 +40,7 @@ next-env.d.ts
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# dummy json files
+
+/public/json/

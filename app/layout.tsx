@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Provider from "./(components)/Provider";
+import { Toaster } from "sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,6 +31,20 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Toaster
+          richColors
+          theme="dark"
+          toastOptions={{
+            classNames: {
+              success: "shadow-[rgba(24,216,96,0.75)_0px_0px_6px_4px]",
+              error: "shadow-[rgba(216,24,96,0.5)_0px_0px_6px_4px]",
+              info: "shadow-[rgba(24,96,216,0.75)_0px_0px_6px_4px]",
+              warning: "shadow-[rgba(223,182,0,0.75)_0px_0px_6px_4px]",
+            },
+          }}
+          position="bottom-center"
+          closeButton
+        />
         <Provider>{children}</Provider>
       </body>
     </html>
