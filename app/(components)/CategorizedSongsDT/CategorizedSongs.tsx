@@ -64,7 +64,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
   table.getState().pagination.pageSize = 7;
 
   return (
-    <div className="w-full rounded-md py-2.5 px-4 md:py-8 md:px-14 shadow-[rgba(24,216,96,0.8)_0px_0px_15px_12px]">
+    <div className="w-full rounded-md py-2.5 px-4 md:py-8 md:px-14 shadow-spotify">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter songs..."

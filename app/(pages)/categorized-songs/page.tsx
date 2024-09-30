@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import CategorizedSongs from "../(components)/CategorizedSongsDT/CategorizedSongs";
 import { Song } from "@/typings";
 import { predictSongCategory } from "@/actions/categorize";
 import useSpotify from "@/hooks/useSpotify";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import CategorizedSongs from "@/app/(components)/CategorizedSongsDT/CategorizedSongs";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const msToMinutesAndSeconds = (ms: number) => {
   const minutes = Math.floor(ms / 60000);
@@ -17,16 +19,20 @@ const msToMinutesAndSeconds = (ms: number) => {
 const CategorizedSongsPage = () => {
   const spotifyApi = useSpotify();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const playlistId: string | null = searchParams.get("playlistId");
 
   const { data: session } = useSession();
   const [songs, setSongs] = useState<Song[]>([]);
+  const [playlistName, setPlaylistName] = useState<string | null>(null);
 
   useEffect(() => {
     const categorize = async () => {
       const selectedPlaylist = await spotifyApi.getPlaylist(playlistId!);
       const tracks = selectedPlaylist.body.tracks.items;
+
+      setPlaylistName(selectedPlaylist.body.name);
 
       console.log(tracks);
 
@@ -85,18 +91,35 @@ const CategorizedSongsPage = () => {
       setSongs(songs);
     };
 
-    if (!spotifyApi.getAccessToken()) return;
+    if (!spotifyApi.getAccessToken()) {
+      toast.error("No access token found, redirecting...");
 
-    if (!playlistId) return; // TODO: make error toast and redirect to /playlists
+      setTimeout(() => {
+        router.push("/");
+      }, 4000);
+    }
+
+    if (!playlistId) {
+      toast.error("No playlist selected, redirecting...");
+
+      setTimeout(() => {
+        router.push("/playlists");
+      }, 4000);
+    }
 
     categorize();
-  }, [session, spotifyApi]);
+
+    // toast.success(
+    //   "api calls for /categorized-songs: getPlaylist(playlistId!), getAudioFeaturesForTrack(trackId)"
+    // );
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center w-full mx-auto p-3 md:p-8 bg-black text-gray-100 min-h-screen">
       <p className="text-5xl py-8 font-bold text-transparent bg-clip-text bg-gradient-to-t from-primary to-white via-white/80">
-        Your songs from playlist (playlist_name) are categorized!
+        <span className="text-primary/75">{"{"}</span> {playlistName}{" "}
+        <span className="text-primary/75">{"}"}</span> categorized!
       </p>
-
       <CategorizedSongs songs={songs} />
     </div>
   );
