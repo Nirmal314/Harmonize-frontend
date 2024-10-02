@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Song } from "@/typings";
 import { predictSongCategory } from "@/actions/categorize";
 import useSpotify from "@/hooks/useSpotify";
@@ -125,4 +125,8 @@ const CategorizedSongsPage = () => {
   );
 };
 
-export default CategorizedSongsPage;
+export default () => (
+  <Suspense>
+    <CategorizedSongsPage />
+  </Suspense>
+);

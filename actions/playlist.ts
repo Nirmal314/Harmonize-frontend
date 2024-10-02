@@ -57,6 +57,7 @@ export const getPlaylistData = cache(async (playlistId: string) => {
           track.track?.artists.map((artist) => artist.name).join(", ") || "",
         album: track.track?.album.name || "",
         duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
+        // @ts-ignore
         category: prediction.predicted_category,
       };
     });

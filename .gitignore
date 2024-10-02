@@ -44,3 +44,5 @@ yarn.lock
 # dummy json files
 
 /public/json/
+
+stash.txt
