@@ -4,7 +4,13 @@ import { InputSongAudioFeatures } from "@/typings";
 import { revalidatePath } from "next/cache";
 
 type PredictionResult = {
-  predicted_category: string;
+  predicted_category:
+    | "happy"
+    | "sad"
+    | "calm"
+    | "energetic"
+    | "confident"
+    | "instrumental";
 };
 
 export async function predictSongCategory(
