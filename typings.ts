@@ -62,3 +62,11 @@ export type TrackWithCategory = {
   track: SpotifyApi.TrackObjectFull;
   category: Category;
 };
+
+export type Features = {
+  danceability: number;
+  energy: number;
+  acousticness: number;
+  valence: number;
+  tempo: number;
+};
