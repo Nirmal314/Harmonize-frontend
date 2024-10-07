@@ -18,8 +18,8 @@ const CategorizedSongsPage = async ({
       await getPlaylistData(playlistId);
 
     return (
-      <div className="flex flex-col items-center justify-center w-full mx-auto p-3 md:px-8 bg-black text-gray-100 min-h-screen overflow-y-hidden">
-        <p className="text-5xl py-8 font-bold text-transparent bg-clip-text bg-gradient-to-t from-primary to-white via-white/80">
+      <div className="flex flex-col items-center justify-center w-full mx-auto p-3 md:px-8 h-full">
+        <p className="text-5xl mb-8 pb-6 mt-2 font-bold text-transparent bg-clip-text bg-gradient-to-t from-primary to-white via-white/80">
           <span className="text-primary/75">{"{"}</span> {playlistName}{" "}
           <span className="text-primary/75">{"}"}</span> categorized!
         </p>

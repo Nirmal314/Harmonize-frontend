@@ -9,16 +9,16 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/login" && token) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if ((pathname === "/" || pathname === "/") && token) {
+    return NextResponse.redirect(new URL("/playlists", request.url));
   }
 
   if (pathname.includes("/api/auth") || token) {
     return NextResponse.next();
   }
 
-  if (pathname !== "/login" && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (pathname !== "/" && !token) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 }
 
