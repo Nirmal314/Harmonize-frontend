@@ -6,8 +6,8 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import React, { useEffect } from "react";
-import LogoutButton from "./LogoutButton";
-import LoginButton from "./LoginButton";
+import LogoutButton from "./Buttons/LogoutButton";
+import LoginButton from "./Buttons/LoginButton";
 import { usePathname } from "next/navigation";
 
 const Header = () => {

@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Music, Smile, Frown, Cloud, Zap, Star, Mic } from "lucide-react";
+import { Smile, Frown, Cloud, Zap, Star, Mic } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
-import LoginButton from "@/app/(components)/LoginButton";
+import LoginButton from "@/app/(components)/Buttons/LoginButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 

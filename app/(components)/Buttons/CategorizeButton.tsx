@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "../../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import { Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -17,11 +17,11 @@ const Categorize = ({ playlistId }: { playlistId: string }) => {
   return (
     <>
       <Button
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white flex flex-col items-center justify-center h-auto py-2 px-1 sm:flex-row sm:py-2 sm:px-3"
         onClick={() => navigateToCategorizedPage()}
       >
-        <Wand2 className="mr-3 h-4 w-4" />
-        <span>Categorize</span>
+        <Wand2 className="w-4 h-4 mb-1 sm:mr-2 sm:mb-0" />
+        <span className="text-xs sm:text-sm">Categorize</span>
       </Button>
     </>
   );

@@ -1,5 +1,6 @@
 import { getPlaylists } from "@/actions/spotify";
-import PlaylistLoadingCard from "@/app/(components)/loading/PlaylistLoadingCard";
+import AlertDialogClient from "@/app/(components)/AlertDialogClient";
+import PlaylistLoadingCard from "@/app/(components)/Loading/PlaylistLoadingCard";
 import PlaylistCard from "@/app/(components)/PlaylistCard";
 import { Playlist } from "@/typings";
 import React, { Suspense } from "react";
@@ -14,7 +15,7 @@ const Playlists = async () => {
           Your Spotify Playlists
         </span>
       </h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {playlists.map((playlist: Playlist) => (
           <Suspense key={playlist.id} fallback={<PlaylistLoadingCard />}>
             <PlaylistCard playlist={playlist} />
