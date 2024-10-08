@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import CategorizedSongs from "@/app/(components)/CategorizedSongsDT/CategorizedSongs";
 import { Song } from "@/typings";
 import { getPlaylistData } from "@/actions/spotify";
-import { toast } from "sonner";
 import ErrorToast from "@/app/(components)/ErrorToast";
 
 const CategorizedSongsPage = async ({
