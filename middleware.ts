@@ -7,9 +7,15 @@ export async function middleware(request: NextRequest) {
     secret: process.env.JWT_SECRET,
   });
 
+  console.log("[middleware] token: ", token);
+
   const { pathname } = request.nextUrl;
 
-  if ((pathname === "/" || pathname === "/") && token) {
+  if (pathname === "/" && token) {
+    console.log("[middleware] pathname = '/'");
+    console.log("[middleware] token found.");
+    console.log("redirecting to /playlists instead of /");
+
     return NextResponse.redirect(new URL("/playlists", request.url));
   }
 
@@ -18,6 +24,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname !== "/" && !token) {
+    console.log(`[middleware] pathname = ${pathname}`);
+    console.log("[middleware] token not found.");
+    console.log(`redirecting to / instead of ${pathname}`);
     return NextResponse.redirect(new URL("/", request.url));
   }
 }
