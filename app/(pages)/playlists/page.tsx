@@ -1,5 +1,4 @@
 import { getPlaylists } from "@/actions/spotify";
-import AlertDialogClient from "@/app/(components)/AlertDialogClient";
 import PlaylistLoadingCard from "@/app/(components)/Loading/PlaylistLoadingCard";
 import PlaylistCard from "@/app/(components)/PlaylistCard";
 import { Playlist } from "@/typings";

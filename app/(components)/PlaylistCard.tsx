@@ -28,7 +28,6 @@ import DummyCover from "@/public/dummy-cover.jpg";
 import { Playlist } from "@/typings";
 import Categorize from "./Buttons/CategorizeButton";
 import UnfollowPlaylist from "./Buttons/UnfollowPlaylist";
-import AlertDialogClient from "./AlertDialogClient";
 
 const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
   return (
