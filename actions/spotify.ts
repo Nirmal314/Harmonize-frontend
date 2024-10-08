@@ -50,28 +50,34 @@ export const getPlaylistData = cache(async (playlistId: string) => {
       tracks.map(async (track, index) => {
         const audioFeature = audioFeatures[index].body;
 
-        const prediction =
-          audioFeature.instrumentalness > 0.6
-            ? { predicted_category: "instrumental" }
-            : await predictSongCategory({
-                // Await the prediction here
-                danceability: audioFeature.danceability,
-                acousticness: audioFeature.acousticness,
-                valence: audioFeature.valence,
-                tempo: audioFeature.tempo,
-                energy: audioFeature.energy,
-              });
+        try {
+          const prediction =
+            audioFeature.instrumentalness > 0.6
+              ? { predicted_category: "instrumental" }
+              : await predictSongCategory({
+                  // Await the prediction here
+                  danceability: audioFeature.danceability,
+                  acousticness: audioFeature.acousticness,
+                  valence: audioFeature.valence,
+                  tempo: audioFeature.tempo,
+                  energy: audioFeature.energy,
+                });
 
-        return {
-          image: track.track?.album.images[0]?.url || "",
-          url: track.track?.external_urls.spotify || "",
-          name: track.track?.name || "",
-          artist:
-            track.track?.artists.map((artist) => artist.name).join(", ") || "",
-          album: track.track?.album.name || "",
-          duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
-          category: prediction.predicted_category,
-        } as Song;
+          return {
+            image: track.track?.album.images[0]?.url || "",
+            url: track.track?.external_urls.spotify || "",
+            name: track.track?.name || "",
+            artist:
+              track.track?.artists.map((artist) => artist.name).join(", ") ||
+              "",
+            album: track.track?.album.name || "",
+            duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
+            category: prediction.predicted_category,
+          } as Song;
+        } catch (e) {
+          console.error("Error in prediction API", e);
+          throw new Error("Error in prediction API. Please try again later.");
+        }
       })
     );
 

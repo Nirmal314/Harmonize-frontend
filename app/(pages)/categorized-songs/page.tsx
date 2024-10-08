@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import CategorizedSongs from "@/app/(components)/CategorizedSongsDT/CategorizedSongs";
 import { Song } from "@/typings";
 import { getPlaylistData } from "@/actions/spotify";
+import { toast } from "sonner";
+import ErrorToast from "@/app/(components)/ErrorToast";
 
 const CategorizedSongsPage = async ({
   searchParams,
@@ -27,8 +29,12 @@ const CategorizedSongsPage = async ({
       </div>
     );
   } catch (error) {
-    console.error("Error fetching playlist data:", error);
-    return <div>Error fetching playlist data. Please try again later.</div>;
+    return (
+      <ErrorToast
+        error="Something went wrong. Please try again later."
+        redirect="/playlists"
+      />
+    );
   }
 };
 
