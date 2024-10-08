@@ -5,12 +5,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Music, Smile, Frown, Cloud, Zap, Star, Mic } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import LoginButton from "@/app/(components)/LoginButton";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+
+const getErrorMessage = (error: string): string => {
+  switch (error) {
+    case "OAuthCallback":
+      return "There was an issue with the OAuth authentication. Please try again or contact support if the problem persists.";
+    case "invalid_request":
+      return "The request was invalid. Please check your details and try again.";
+    case "access_denied":
+      return "Access was denied. Please ensure you have the necessary permissions.";
+    default:
+      return "An unknown error occurred. Please try again later.";
+  }
+};
 
 const Home = () => {
   const moodCategoriesRef = useRef<HTMLElement>(null);
   const readyToHarmonizeRef = useRef<HTMLElement>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      toast.error(getErrorMessage(error));
+      router.push("/");
+    }
+  }, [searchParams]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
