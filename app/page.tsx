@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Smile, Frown, Cloud, Zap, Star, Mic } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Suspense, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import LoginButton from "@/app/(components)/Buttons/LoginButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -23,16 +23,17 @@ const getErrorMessage = (error: string): string => {
   }
 };
 
-const Home = () => {
+const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
   const moodCategoriesRef = useRef<HTMLElement>(null);
   const readyToHarmonizeRef = useRef<HTMLElement>(null);
-  const searchParams = useSearchParams();
   const router = useRouter();
 
+  // const searchParams = useSearchParams();
+
   useEffect(() => {
-    const error = searchParams.get("error");
-    if (error) {
-      toast.error(getErrorMessage(error));
+    // const error = searchParams.get("error");
+    if (searchParams.error) {
+      toast.error(getErrorMessage(searchParams.error));
       router.push("/");
     }
   }, [searchParams]);
@@ -315,8 +316,4 @@ const Home = () => {
     </div>
   );
 };
-export default () => {
-  <Suspense>
-    <Home />
-  </Suspense>;
-};
+export default Home;
