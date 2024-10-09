@@ -1,5 +1,5 @@
 import { getPlaylists } from "@/actions/spotify";
-import PlaylistLoadingCard from "@/app/(components)/Loading/PlaylistLoadingCard";
+import PlaylistLoadingCard from "@/app/(components)/loading/PlaylistLoadingCard";
 import PlaylistCard from "@/app/(components)/PlaylistCard";
 import { Playlist } from "@/typings";
 import React, { Suspense } from "react";
