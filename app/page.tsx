@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Smile, Frown, Cloud, Zap, Star, Mic } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import LoginButton from "@/app/(components)/Buttons/LoginButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -315,4 +315,8 @@ const Home = () => {
     </div>
   );
 };
-export default Home;
+export default () => {
+  <Suspense>
+    <Home />
+  </Suspense>;
+};
