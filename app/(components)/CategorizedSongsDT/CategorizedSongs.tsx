@@ -73,6 +73,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm border-gray-700 mr-2"
+          aria-label="Filter songs"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -158,17 +159,19 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          className="bg-transparent border hover:border-primary hover:text-black border-gray-700 "
+          className="bg-transparent border hover:border-primary hover:text-black border-gray-700"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          aria-label="Previous page"
         >
           <ArrowLeft className="mr-2" />
           <span>Previous</span>
         </Button>
         <Button
-          className="bg-transparent border hover:border-primary hover:text-black border-gray-700 "
+          className="bg-transparent border hover:border-primary hover:text-black border-gray-700"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          aria-label="Next page"
         >
           <span className="mr-2">Next</span>
           <ArrowRight />
