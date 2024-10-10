@@ -61,7 +61,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
     },
   });
 
-  table.getState().pagination.pageSize = 7;
+  table.getState().pagination.pageSize = 5;
 
   return (
     <div className="w-full rounded-md py-1.5 px-4 md:py-4 md:px-14 shadow-spotify">

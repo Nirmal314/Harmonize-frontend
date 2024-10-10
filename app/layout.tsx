@@ -4,6 +4,7 @@ import "./globals.css";
 import Provider from "./(components)/Provider";
 import { Toaster } from "sonner";
 import Header from "./(components)/Header";
+import Head from "next/head";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -48,7 +49,7 @@ export default function RootLayout({
         />
         <Provider>
           <Header />
-          <main className="pt-10 h-full">{children}</main> {/* 10 */}
+          <main className="pt-14 h-full">{children}</main>
         </Provider>
       </body>
     </html>
