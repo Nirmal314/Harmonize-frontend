@@ -63,7 +63,7 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
 
   return (
     <div className="flex flex-col">
-      <main className="flex-1 pt-14">
+      <main className="flex-1">
         <motion.section
           initial="hidden"
           animate="visible"
