@@ -29,7 +29,7 @@ const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
   collaborative: playlist.collaborative,
 });
 
-export const getPlaylistData = cache(async (playlistId: string) => {
+export const getPlaylistData = async (playlistId: string) => {
   const session = await getServerSession(authOptions);
   if (!session || !session.user.accessToken) {
     throw new Error("Unauthorized");
@@ -41,21 +41,42 @@ export const getPlaylistData = cache(async (playlistId: string) => {
     const playlist = await spotifyApi.getPlaylist(playlistId);
     const tracks = playlist.body.tracks.items;
 
-    const trackIds = tracks.map((track) => track.track?.id!).filter(Boolean);
-    const audioFeatures = await Promise.all(
-      trackIds.map((trackId) => spotifyApi.getAudioFeaturesForTrack(trackId))
+    const trackIds = tracks.map((track) => track.track?.id).filter(Boolean);
+
+    const audioFeatures = await fetchAudioFeaturesInBatches(
+      trackIds as string[]
     );
 
     const songs: Song[] = await Promise.all(
       tracks.map(async (track, index) => {
-        const audioFeature = audioFeatures[index].body;
+        const audioFeature = audioFeatures[index]?.body;
+
+        // Return a default Song object if audio features are missing
+        if (!audioFeature) {
+          console.warn(`No audio feature for track ${track.track?.id}`);
+          return {
+            image: track.track?.album.images[0]?.url || "",
+            url: track.track?.external_urls.spotify || "",
+            name: track.track?.name || "Unknown Name",
+            artist:
+              track.track?.artists.map((artist) => artist.name).join(", ") ||
+              "Unknown Artist",
+            album: track.track?.album.name || "Unknown Album",
+            duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
+            category: "Unknown",
+          } as Song;
+        }
 
         try {
+          // const prediction =
+          //   audioFeature.instrumentalness > 0.6
+          //     ? { predicted_category: "instrumental" }
+          //     : { predicted_category: "instrumental" }
+
           const prediction =
             audioFeature.instrumentalness > 0.6
               ? { predicted_category: "instrumental" }
               : await predictSongCategory({
-                  // Await the prediction here
                   danceability: audioFeature.danceability,
                   acousticness: audioFeature.acousticness,
                   valence: audioFeature.valence,
@@ -66,11 +87,11 @@ export const getPlaylistData = cache(async (playlistId: string) => {
           return {
             image: track.track?.album.images[0]?.url || "",
             url: track.track?.external_urls.spotify || "",
-            name: track.track?.name || "",
+            name: track.track?.name || "Unknown Name",
             artist:
               track.track?.artists.map((artist) => artist.name).join(", ") ||
-              "",
-            album: track.track?.album.name || "",
+              "Unknown Artist",
+            album: track.track?.album.name || "Unknown Album",
             duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
             category: prediction.predicted_category,
           } as Song;
@@ -83,15 +104,42 @@ export const getPlaylistData = cache(async (playlistId: string) => {
 
     return {
       playlistName: playlist.body.name,
-      songs,
+      songs: songs.filter(Boolean),
     };
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      throw new Error("Unauthorized: Spotify token expired.");
+    }
+    if (error?.response?.status === 429) {
+      console.error("Rate limit hit, please try again later.");
+      throw new Error("Spotify rate limit exceeded, please try again later.");
+    }
     console.error("Error fetching Spotify data:", error);
-    throw new Error("Failed to fetch Spotify data");
+    throw new Error(`Failed to fetch Spotify data: ${error.message}`);
   }
-});
+};
 
-export const getPlaylists = cache(async () => {
+async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 20) {
+  const results = [];
+  for (let i = 0; i < trackIds.length; i += batchSize) {
+    const batch = trackIds.slice(i, i + batchSize);
+    try {
+      const audioFeatures = await Promise.all(
+        batch.map((trackId) => spotifyApi.getAudioFeaturesForTrack(trackId))
+      );
+      results.push(...audioFeatures);
+    } catch (error) {
+      console.error("Error fetching audio features", error);
+      throw new Error("Failed to fetch audio features.");
+    }
+
+    // Wait to prevent hitting rate limits
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  return results;
+}
+
+export const getPlaylists = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user.accessToken) {
@@ -120,4 +168,4 @@ export const getPlaylists = cache(async () => {
     console.error("Error fetching Spotify data:", error);
     throw new Error("Failed to fetch Spotify data");
   }
-});
+};

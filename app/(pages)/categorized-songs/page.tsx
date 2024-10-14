@@ -7,6 +7,8 @@ import ErrorToast from "@/app/(components)/ErrorToast";
 import { Disc3, Music } from "lucide-react";
 import Celebrate from "@/app/(components)/Celebrate";
 
+type PlaylistData = { playlistName: string; songs: Song[] };
+
 const CategorizedSongsPage = async ({
   searchParams,
 }: {
@@ -17,8 +19,9 @@ const CategorizedSongsPage = async ({
   if (!playlistId) redirect("/playlists");
 
   try {
-    const { playlistName, songs }: { playlistName: string; songs: Song[] } =
-      await getPlaylistData(playlistId);
+    const { playlistName, songs }: PlaylistData = await getPlaylistData(
+      playlistId
+    );
 
     return (
       <div className="w-full flex flex-col items-center justify-center p-3 md:px-8 h-full">
