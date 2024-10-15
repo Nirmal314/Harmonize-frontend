@@ -7,7 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import LoginButton from "@/app/(components)/Buttons/LoginButton";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const getErrorMessage = (error: string): string => {
@@ -28,10 +28,7 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
   const readyToHarmonizeRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
-  // const searchParams = useSearchParams();
-
   useEffect(() => {
-    // const error = searchParams.get("error");
     if (searchParams.error) {
       toast.error(getErrorMessage(searchParams.error));
       router.push("/");
@@ -57,8 +54,18 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
     },
   };
 
-  const scrollToNextSection = (ref: React.RefObject<HTMLElement>) => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToNextSection = (
+    ref: React.RefObject<HTMLElement>,
+    offset: number = 100
+  ) => {
+    if (ref.current) {
+      const topPosition =
+        ref.current.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: topPosition - offset,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (
@@ -102,8 +109,8 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
             <motion.div variants={itemVariants} className="space-x-4">
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => scrollToNextSection(moodCategoriesRef)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
+                onClick={() => scrollToNextSection(moodCategoriesRef, 60)}
               >
                 Get Started
               </Button>
@@ -119,7 +126,7 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1 }}
-              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-center mb-12"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-center mt-12 md:mt-0 mb-12"
             >
               <motion.span
                 className="text-primary relative inline-block"
@@ -243,8 +250,8 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
             >
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => scrollToNextSection(readyToHarmonizeRef)}
+                className="bg-primary mb-12 md:mb-0 text-primary-foreground hover:bg-primary/90 rounded-full"
+                onClick={() => scrollToNextSection(readyToHarmonizeRef, 0)}
               >
                 Let's connect to your Spotify!
               </Button>
@@ -269,13 +276,6 @@ const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
                 initial={{ backgroundSize: "0 3px" }}
                 whileInView={{ backgroundSize: "100% 3px" }}
                 transition={{ duration: 1, delay: 1 }}
-                style={{
-                  paddingBottom: "8px",
-                  backgroundImage:
-                    "linear-gradient(to right, #18d860, #18d860)",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "0 100%",
-                }}
               >
                 Ready to Harmonize Your Music?
               </motion.span>
