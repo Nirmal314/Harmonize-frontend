@@ -4,6 +4,7 @@ import React, { useTransition } from "react";
 import { Button } from "../../../components/ui/button";
 import { Wand2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Sparkles from "../Sparkles";
 
 const Categorize = ({ playlistId }: { playlistId: string }) => {
   const [isPending, startTransition] = useTransition();
@@ -19,17 +20,23 @@ const Categorize = ({ playlistId }: { playlistId: string }) => {
 
   return (
     <>
-      <Button
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center h-auto py-2 px-1 sm:py-2 sm:px-3"
-        onClick={navigateToCategorizedPage}
-        disabled={isPending}
-        variant={isPending ? "purple" : "default"}
-      >
-        <Wand2 className={`w-4 h-4 mr-2 ${isPending ? "hidden" : "block"}`} />
-        <span className="text-xs sm:text-sm">
-          {isPending ? "Categorizing... ✨" : "Categorize"}
-        </span>
-      </Button>
+      <div className="relative">
+        <div className="relative">
+          <Button
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center h-auto py-2 px-1 sm:py-2 sm:px-3"
+            onClick={navigateToCategorizedPage}
+            disabled={isPending}
+            variant={isPending ? "purple" : "default"}
+          >
+            <Wand2 className={`w-4 h-4`} />
+            <span className="sr-only">
+              {isPending ? "Categorizing... ✨" : "Categorize"}
+            </span>
+          </Button>
+        </div>
+
+        <Sparkles />
+      </div>
     </>
   );
 };

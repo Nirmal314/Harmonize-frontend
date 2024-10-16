@@ -44,12 +44,12 @@ const UnfollowPlaylist = ({ playlistId, playlistName, totalTracks }: Props) => {
         className="flex items-center justify-center py-2 px-1 h-auto"
         onClick={() => setIsOpen(true)}
       >
-        <Trash2 className="w-4 h-4 mr-2" />
-        <span className="text-xs sm:text-sm">Unfollow</span>
+        <Trash2 className="w-4 h-4" />
+        <span className="sr-only">Unfollow</span>
       </Button>
 
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent variant="danger">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>

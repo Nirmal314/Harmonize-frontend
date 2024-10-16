@@ -30,6 +30,7 @@ export const columns: ColumnDef<Song, any>[] = [
     cell: ({ row }) => row.index + 1,
     enableSorting: false,
     enableHiding: false,
+    size: 50,
   },
   {
     accessorKey: "name",
@@ -46,19 +47,19 @@ export const columns: ColumnDef<Song, any>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="flex">
+      <div className="flex items-center space-x-2 max-w-[300px]">
         <Image
           src={row.original.image}
           alt={`${row.getValue("name")} album cover`}
-          height={60}
-          width={60}
-          className="rounded-sm hover:shadow-md transition-shadow mr-2"
+          height={40}
+          width={40}
+          className="rounded-sm hover:shadow-md transition-shadow flex-shrink-0"
         />
-        <div className="flex flex-col">
-          <div className="text-nowrap font-semibold group-hover:text-primary group-hover:underline cursor-pointer transition-colors">
+        <div className="flex flex-col min-w-0">
+          <div className="font-semibold truncate group-hover:text-primary group-hover:underline cursor-pointer transition-colors">
             {row.getValue("name")}
           </div>
-          <div className="text-nowrap text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground truncate">
             {row.original.artist}
           </div>
         </div>
@@ -80,7 +81,12 @@ export const columns: ColumnDef<Song, any>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="capitalize text-nowrap">{row.getValue("album")}</div>
+      <div
+        className="capitalize truncate max-w-[200px]"
+        title={row.getValue("album")}
+      >
+        {row.getValue("album")}
+      </div>
     ),
   },
   {
@@ -100,6 +106,7 @@ export const columns: ColumnDef<Song, any>[] = [
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("duration")}</div>
     ),
+    size: 100,
   },
   {
     accessorKey: "category",
@@ -124,5 +131,6 @@ export const columns: ColumnDef<Song, any>[] = [
         {row.getValue("category")}
       </span>
     ),
+    size: 120,
   },
 ];

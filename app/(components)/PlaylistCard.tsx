@@ -43,6 +43,10 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
             fill
             className="object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+          <CardTitle className="absolute bottom-4 left-4 right-4 text-white text-xl font-bold line-clamp-2">
+            {playlist.name}
+          </CardTitle>
           <div className="absolute top-2 right-2 z-10">
             <DropdownMenu modal={true}>
               <DropdownMenuTrigger asChild>
@@ -71,7 +75,6 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <CardTitle className="text-gray-100 mb-3">{playlist.name}</CardTitle>
         <CardDescription className="text-gray-400">
           {playlist.description}
         </CardDescription>
@@ -105,7 +108,7 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="flex flex-col space-y-2 w-full">
+        <div className="grid grid-cols-3 gap-2 w-full">
           <Button
             asChild
             className="bg-primary hover:bg-primary/75 text-gray-800 flex items-center justify-center h-auto py-2 px-1 sm:flex-row sm:py-2 sm:px-3"
@@ -116,8 +119,8 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
               rel="noopener noreferrer"
               className="flex items-center"
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              <span className="text-xs sm:text-sm">Open in Spotify</span>
+              <ExternalLink className="w-4 h-4" />
+              <span className="sr-only">Open in Spotify</span>
             </Link>
           </Button>
           <Categorize playlistId={playlist.id} />

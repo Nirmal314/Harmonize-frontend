@@ -61,7 +61,21 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
     },
   });
 
-  table.getState().pagination.pageSize = 5;
+  React.useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      const newPageSize = isMobile ? 5 : 7;
+      table.setPageSize(newPageSize);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [table]);
 
   return (
     <div className="w-full rounded-md py-1.5 px-4 md:py-4 md:px-14 shadow-spotify">
@@ -105,8 +119,8 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border border-gray-700">
-        <Table>
+      <div className="rounded-md border border-gray-700 overflow-x-auto">
+        <Table className="min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow className="hover:bg-transparent" key={headerGroup.id}>
@@ -135,7 +149,7 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
                   onClick={() => window.open(row.original.url, "_blank")}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -159,21 +173,19 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          className="bg-transparent border hover:border-primary hover:text-black border-gray-700"
+          className="bg-transparent rounded-full border hover:border-primary hover:text-black border-gray-700"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
           aria-label="Previous page"
         >
-          <ArrowLeft className="mr-2" />
-          <span>Previous</span>
+          <ArrowLeft />
         </Button>
         <Button
-          className="bg-transparent border hover:border-primary hover:text-black border-gray-700"
+          className="bg-transparent rounded-full border hover:border-primary hover:text-black border-gray-700"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
           aria-label="Next page"
         >
-          <span className="mr-2">Next</span>
           <ArrowRight />
         </Button>
       </div>
