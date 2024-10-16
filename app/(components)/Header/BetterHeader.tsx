@@ -1,5 +1,4 @@
 "use client";
-
 import { useSession } from "next-auth/react";
 import React from "react";
 import { motion } from "framer-motion";
@@ -13,7 +12,7 @@ const BetterHeader = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100 }}
-      className="bg-[#0000007c] fixed top-0 left-0 right-0 px-4 lg:px-6 h-14 flex justify-between items-center z-50 backdrop-filter backdrop-blur-xl bg-opacity-60"
+      className="fixed top-0 left-0 right-0 z-50 bg-[#0000007c] no-backdrop-blur backdrop-filter backdrop-blur-xl bg-opacity-60 px-4 lg:px-6 h-14 flex justify-between items-center"
     >
       <HeaderLeft />
       <HeaderRight session={session} />

@@ -88,7 +88,7 @@ const HeaderRight = ({ session }: { session: Session | null }) => {
             animate="open"
             exit="closed"
             variants={menuVariants}
-            className="absolute top-14 left-0 right-0 bg-[#0000007c] backdrop-filter backdrop-blur-xl bg-opacity-60 p-4 md:hidden"
+            className="absolute top-14 left-0 right-0 bg-[#0000007c] backdrop-filter no-backdrop-blur backdrop-blur-xl bg-opacity-60 p-4 md:hidden"
           >
             {session ? (
               <div className="mt-4 flex items-center justify-between">

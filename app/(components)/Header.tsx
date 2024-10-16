@@ -44,7 +44,7 @@ const Header = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100 }}
-      className="bg-[#0000007c] fixed top-0 left-0 right-0 px-4 lg:px-6 h-14 flex justify-between items-center z-50 backdrop-filter backdrop-blur-xl bg-opacity-60"
+      className="bg-[#0000007c] no-backdrop-blur fixed top-0 left-0 right-0 px-4 lg:px-6 h-14 flex justify-between items-center z-50 backdrop-filter backdrop-blur-xl bg-opacity-60"
     >
       <Link className="flex items-center justify-center" href="/playlists">
         <Music className="h-6 w-6 text-primary" />
@@ -69,7 +69,7 @@ const Header = () => {
             animate="open"
             exit="closed"
             variants={menuVariants}
-            className="absolute top-14 left-0 right-0 bg-[#0000007c] backdrop-filter backdrop-blur-xl bg-opacity-60 p-4 md:hidden"
+            className="absolute top-14 left-0 right-0 bg-[#0000007c] no-backdrop-blur backdrop-filter backdrop-blur-xl bg-opacity-60 p-4 md:hidden"
           >
             <nav className="flex flex-col gap-4">
               <Link

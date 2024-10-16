@@ -246,6 +246,15 @@
   .style-VG2eL {
     animation-delay: 1.7s;
   }
+
+  /* Check if blur is supported */
+
+  /* Fallback for browsers that don't support backdrop-filter */
+  @supports not (backdrop-filter: blur(10px)) {
+    .no-backdrop-blur {
+      background-color: #000000 !important; /* Solid black background */
+    }
+  }
 }
 
 @layer utilities {
