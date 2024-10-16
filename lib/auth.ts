@@ -52,9 +52,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, user }) {
       if (account && user) {
-        console.log(
-          "[auth.ts] returning token with accessToken, refreshToken, username, accessTokenExpires."
-        );
+        // console.log(
+        //   "[auth.ts] returning token with accessToken, refreshToken, username, accessTokenExpires."
+        // );
         return {
           ...token,
           accessToken: account.access_token,
@@ -77,9 +77,9 @@ export const authOptions: NextAuthOptions = {
       session.user!.refreshToken = (token as Token).refreshToken;
       session.user!.username = (token as Token).username;
 
-      console.log(
-        "[auth.ts] returning session with accessToken, refreshToken, username."
-      );
+      // console.log(
+      //   "[auth.ts] returning session with accessToken, refreshToken, username."
+      // );
       return session;
     },
   },

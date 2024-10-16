@@ -111,6 +111,10 @@
     @apply shadow-[rgba(24,216,96,0.8)_0px_0px_15px_12px];
   }
 
+  .shadow-purple {
+    @apply shadow-[rgba(128,0,128,0.8)_0px_0px_15px_12px];
+  }
+
   /* Hamburger menu */
   .hamburger {
     cursor: pointer;
