@@ -14,7 +14,7 @@ const Playlists = async () => {
           Your Spotify Playlists
         </span>
       </h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {playlists.map((playlist: Playlist) => (
           <Suspense key={playlist.id} fallback={<PlaylistLoadingCard />}>
             <PlaylistCard playlist={playlist} />

@@ -41,10 +41,10 @@ const UnfollowPlaylist = ({ playlistId, playlistName, totalTracks }: Props) => {
     <>
       <Button
         variant="destructive"
-        className="flex flex-col items-center justify-center h-auto py-2 px-1 sm:flex-row sm:py-2 sm:px-3"
+        className="flex items-center justify-center py-2 px-1 h-auto"
         onClick={() => setIsOpen(true)}
       >
-        <Trash2 className="w-4 h-4 mb-1 sm:mr-2 sm:mb-0" />
+        <Trash2 className="w-4 h-4 mr-2" />
         <span className="text-xs sm:text-sm">Unfollow</span>
       </Button>
 

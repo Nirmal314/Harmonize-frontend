@@ -105,18 +105,18 @@ const PlaylistCard = ({ playlist }: { playlist: Playlist }) => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="grid grid-cols-3 gap-2 w-full">
+        <div className="flex flex-col space-y-2 w-full">
           <Button
             asChild
-            className="bg-primary hover:bg-primary/75 text-gray-800 flex flex-col items-center justify-center h-auto py-2 px-1 sm:flex-row sm:py-2 sm:px-3"
+            className="bg-primary hover:bg-primary/75 text-gray-800 flex items-center justify-center h-auto py-2 px-1 sm:flex-row sm:py-2 sm:px-3"
           >
             <Link
               href={playlist.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col sm:flex-row items-center"
+              className="flex items-center"
             >
-              <ExternalLink className="w-4 h-4 mb-1 sm:mr-2 sm:mb-0" />
+              <ExternalLink className="w-4 h-4 mr-2" />
               <span className="text-xs sm:text-sm">Open in Spotify</span>
             </Link>
           </Button>

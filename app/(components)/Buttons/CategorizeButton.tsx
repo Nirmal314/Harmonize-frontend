@@ -20,16 +20,12 @@ const Categorize = ({ playlistId }: { playlistId: string }) => {
   return (
     <>
       <Button
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white flex flex-col items-center justify-center h-auto py-2 px-1 sm:flex-row sm:py-2 sm:px-3"
+        className="w-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center h-auto py-2 px-1 sm:py-2 sm:px-3"
         onClick={navigateToCategorizedPage}
         disabled={isPending}
         variant={isPending ? "purple" : "default"}
       >
-        <Wand2
-          className={`w-4 h-4 mb-1 sm:mr-2 sm:mb-0 ${
-            isPending ? "hidden" : "block"
-          }`}
-        />
+        <Wand2 className={`w-4 h-4 mr-2 ${isPending ? "hidden" : "block"}`} />
         <span className="text-xs sm:text-sm">
           {isPending ? "Categorizing... ✨" : "Categorize"}
         </span>
