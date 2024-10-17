@@ -16,11 +16,24 @@ const SparkleButton = ({ handler, isDisabled }: Props) => {
     >
       <Wand2 className={`w-4 h-4`} />
 
-      {[1, 2, 3, 4, 5, 6].map((startNumber) => (
-        <div className={`sparkle-star-${startNumber}`}>
-          <GlowingSparkle />
-        </div>
-      ))}
+      <div className={`sparkle-star-1`}>
+        <GlowingSparkle />
+      </div>
+      <div className={`sparkle-star-2`}>
+        <GlowingSparkle />
+      </div>
+      <div className={`sparkle-star-3`}>
+        <GlowingSparkle />
+      </div>
+      <div className={`sparkle-star-4`}>
+        <GlowingSparkle />
+      </div>
+      <div className={`sparkle-star-5`}>
+        <GlowingSparkle />
+      </div>
+      <div className={`sparkle-star-6`}>
+        <GlowingSparkle />
+      </div>
     </button>
   );
 };
