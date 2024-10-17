@@ -51,9 +51,9 @@ export default function RootLayout({
           <BetterHeader />
           <main className="pt-14 h-full">
             {children}
-            <div className="fixed bottom-6 right-8 sm:right-14 sm:bottom-10 z-[100]">
+            {/* <div className="fixed bottom-6 right-8 sm:right-14 sm:bottom-10 z-[100]">
               <ScrollToTop />
-            </div>
+            </div> */}
           </main>
         </Provider>
       </body>
