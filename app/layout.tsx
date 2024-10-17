@@ -3,8 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Provider from "./(components)/Provider";
 import { Toaster } from "sonner";
-import Header from "./(components)/Header";
 import BetterHeader from "./(components)/Header/BetterHeader";
+import ScrollToTop from "./(components)/Buttons/ScrollToTop";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -49,9 +49,11 @@ export default function RootLayout({
         />
         <Provider>
           <BetterHeader />
-          {/* <Header /> */}
           <main className="pt-14 h-full">
-            <section>{children}</section>
+            {children}
+            <div className="fixed bottom-6 right-8 sm:right-14 sm:bottom-10 z-[100]">
+              <ScrollToTop />
+            </div>
           </main>
         </Provider>
       </body>

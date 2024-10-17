@@ -23,7 +23,9 @@ const getErrorMessage = (error: string): string => {
   }
 };
 
-const Home = ({ searchParams }: { searchParams: { error?: string } }) => {
+type Props = { searchParams: { error?: string } };
+
+const Home = ({ searchParams }: Props) => {
   const moodCategoriesRef = useRef<HTMLElement>(null);
   const readyToHarmonizeRef = useRef<HTMLElement>(null);
   const router = useRouter();
