@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-const ToastManager = ({ playlistName }: { playlistName: string }) => {
+const ToastManager = ({ playlistId }: { playlistId: string }) => {
   useEffect(() => {
     const toastId = Number(sessionStorage.getItem("categorizingToastId"));
 
@@ -11,7 +11,7 @@ const ToastManager = ({ playlistName }: { playlistName: string }) => {
       toast.dismiss(toastId);
       sessionStorage.removeItem("categorizingToastId");
     }
-  }, [playlistName]);
+  }, [playlistId]);
 
   return null;
 };

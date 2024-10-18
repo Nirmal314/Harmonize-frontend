@@ -19,13 +19,32 @@ const CategorizedSongsPage = async ({
   if (!playlistId) redirect("/playlists");
 
   try {
-    const { playlistName, songs }: PlaylistData = await getPlaylistData(
-      playlistId
-    );
+    const data = await getPlaylistData(playlistId);
+
+    if (!data) {
+      return (
+        <ErrorToast
+          error="No playlist data found. Please try again."
+          redirect="/playlists"
+        />
+      );
+    }
+
+    const { playlistName = "Unknown Playlist", songs = [] }: PlaylistData =
+      data;
+
+    if (!Array.isArray(songs) || songs.length === 0) {
+      return (
+        <ErrorToast
+          error="No songs found in this playlist."
+          redirect="/playlists"
+        />
+      );
+    }
 
     return (
       <>
-        <ToastManager playlistName={playlistName} />
+        <ToastManager playlistId={playlistId} />
         <div className="w-full flex flex-col items-center justify-center p-3 md:px-8 h-full">
           <Celebrate />
           <p className="text-3xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 pb-6 mt-2 font-bold text-transparent bg-clip-text text-center bg-gradient-to-t from-primary to-white via-white/80">
@@ -41,12 +60,12 @@ const CategorizedSongsPage = async ({
         </div>
       </>
     );
-  } catch (error) {
+  } catch (error: any) {
     return (
-      <ErrorToast
-        error="Something went wrong. Please try again later."
-        redirect="/playlists"
-      />
+      <>
+        <ToastManager playlistId={playlistId} />
+        <ErrorToast error={error.message} redirect="/playlists" />
+      </>
     );
   }
 };
