@@ -2,30 +2,18 @@
 
 import { getServerSession } from "next-auth/next";
 import SpotifyWebApi from "spotify-web-api-node";
-import { Playlist, Song, SpotifyPlaylist } from "@/typings";
+import { Playlist, Song } from "@/typings";
 import { predictSongCategory } from "@/actions/categorize";
 import { authOptions } from "@/lib/auth";
+import {
+  msToMinutesAndSeconds,
+  formatPlaylistData,
+  handleSpotifyApiError,
+} from "@/utils/spotify";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-});
-
-const msToMinutesAndSeconds = (ms: number) => {
-  const minutes = Math.floor(ms / 60000);
-  const seconds = ((ms % 60000) / 1000).toFixed(0);
-  return `${minutes}:${seconds.padStart(2, "0")}`;
-};
-
-const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
-  id: playlist.id,
-  name: playlist.name,
-  description: playlist.description || "No description available",
-  url: playlist.external_urls.spotify,
-  image: playlist.images[0]?.url || null,
-  trackCount: playlist.tracks.total,
-  followers: playlist.followers?.total || 0,
-  collaborative: playlist.collaborative,
 });
 
 export const getPlaylistData = async (playlistId: string) => {
@@ -46,6 +34,7 @@ export const getPlaylistData = async (playlistId: string) => {
     const tracks = playlist.body.tracks.items;
 
     const trackIds = tracks.map((track) => track.track?.id).filter(Boolean);
+
     const audioFeatures = await fetchAudioFeaturesInBatches(
       trackIds as string[]
     );
@@ -110,39 +99,39 @@ const createSongFromTrack = async (
   } as Song;
 };
 
+const timeoutPromise = (ms: number) =>
+  new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Timeout error")), ms)
+  );
+
+const withTimeout = (promise: Promise<any>, ms: number) => {
+  return Promise.race([promise, timeoutPromise(ms)]);
+};
+
 const getPredictionForTrack = async (audioFeature: any) => {
   if (audioFeature.instrumentalness > 0.6) {
     return { predicted_category: "instrumental" };
   }
 
   try {
-    return await predictSongCategory({
-      danceability: audioFeature.danceability,
-      acousticness: audioFeature.acousticness,
-      valence: audioFeature.valence,
-      tempo: audioFeature.tempo,
-      energy: audioFeature.energy,
-    });
-  } catch (error) {
-    console.error("Error in prediction API", error);
-    return null; // Return null so we have a fallback
+    return await withTimeout(
+      predictSongCategory({
+        danceability: audioFeature.danceability,
+        acousticness: audioFeature.acousticness,
+        valence: audioFeature.valence,
+        tempo: audioFeature.tempo,
+        energy: audioFeature.energy,
+      }),
+      10000
+    );
+  } catch (error: any) {
+    console.error(error);
+    console.error("Error in prediction API", error.message);
+    return null; // Return null if there's an error or a timeout
   }
 };
 
-const handleSpotifyApiError = (error: any) => {
-  if (error?.response?.status === 401) {
-    console.error("Unauthorized error: Spotify token expired", error);
-    throw new Error("Unauthorized: Spotify token expired.");
-  }
-  if (error?.response?.status === 429) {
-    console.error("Rate limit hit, please try again later.", error);
-    throw new Error("Spotify rate limit exceeded, please try again later.");
-  }
-  console.error("Error fetching Spotify data:", error);
-  throw new Error(`Failed to fetch Spotify data: ${error.message || error}`);
-};
-
-async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 20) {
+async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 40) {
   const results = [];
   for (let i = 0; i < trackIds.length; i += batchSize) {
     const batch = trackIds.slice(i, i + batchSize);
@@ -157,7 +146,7 @@ async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 20) {
     }
 
     // Wait to prevent hitting rate limits
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   return results;
 }
