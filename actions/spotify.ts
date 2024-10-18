@@ -11,7 +11,6 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
 
-// Utility functions
 const msToMinutesAndSeconds = (ms: number) => {
   const minutes = Math.floor(ms / 60000);
   const seconds = ((ms % 60000) / 1000).toFixed(0);
@@ -29,23 +28,6 @@ const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
   collaborative: playlist.collaborative,
 });
 
-// Retry logic for async functions
-const retryAsync = async (fn: any, retries = 3) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await fn();
-    } catch (error) {
-      if (i < retries - 1) {
-        console.warn(`Retrying... (${i + 1}/${retries})`);
-        await new Promise((res) => setTimeout(res, 1000)); // Wait before retrying
-      } else {
-        throw error; // Rethrow the error if all retries fail
-      }
-    }
-  }
-};
-
-// Main function to get playlist data
 export const getPlaylistData = async (playlistId: string) => {
   const session = await getServerSession(authOptions);
   if (!session || !session.user.accessToken) {
@@ -60,27 +42,25 @@ export const getPlaylistData = async (playlistId: string) => {
   }
 
   try {
-    const playlist = await retryAsync(() => spotifyApi.getPlaylist(playlistId));
+    const playlist = await spotifyApi.getPlaylist(playlistId);
     const tracks = playlist.body.tracks.items;
 
-    const trackIds = tracks
-      .map((track: any) => track.track?.id)
-      .filter(Boolean);
+    const trackIds = tracks.map((track) => track.track?.id).filter(Boolean);
     const audioFeatures = await fetchAudioFeaturesInBatches(
       trackIds as string[]
     );
+
     const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
 
     return {
       playlistName: playlist.body.name,
       songs: songs.filter(Boolean),
     };
-  } catch (error) {
+  } catch (error: any) {
     handleSpotifyApiError(error);
   }
 };
 
-// Get songs with audio features
 const getSongsWithAudioFeatures = async (
   tracks: SpotifyApi.PlaylistTrackObject[],
   audioFeatures: any
@@ -96,7 +76,6 @@ const getSongsWithAudioFeatures = async (
     .map((result) => (result as PromiseFulfilledResult<Song>).value);
 };
 
-// Create a song object from a track
 const createSongFromTrack = async (
   track: SpotifyApi.PlaylistTrackObject,
   audioFeature: any
@@ -131,7 +110,6 @@ const createSongFromTrack = async (
   } as Song;
 };
 
-// Get prediction for a track
 const getPredictionForTrack = async (audioFeature: any) => {
   if (audioFeature.instrumentalness > 0.6) {
     return { predicted_category: "instrumental" };
@@ -151,7 +129,6 @@ const getPredictionForTrack = async (audioFeature: any) => {
   }
 };
 
-// Handle Spotify API errors
 const handleSpotifyApiError = (error: any) => {
   if (error?.response?.status === 401) {
     console.error("Unauthorized error: Spotify token expired", error);
@@ -161,27 +138,17 @@ const handleSpotifyApiError = (error: any) => {
     console.error("Rate limit hit, please try again later.", error);
     throw new Error("Spotify rate limit exceeded, please try again later.");
   }
-  if (
-    error?.code === "ECONNRESET" ||
-    error?.message.includes("Connection closed")
-  ) {
-    console.error("Connection closed. Retrying...");
-    throw new Error("Connection closed. Please try again.");
-  }
   console.error("Error fetching Spotify data:", error);
   throw new Error(`Failed to fetch Spotify data: ${error.message || error}`);
 };
 
-// Fetch audio features in batches
 async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 20) {
   const results = [];
   for (let i = 0; i < trackIds.length; i += batchSize) {
     const batch = trackIds.slice(i, i + batchSize);
     try {
       const audioFeatures = await Promise.all(
-        batch.map((trackId) =>
-          retryAsync(() => spotifyApi.getAudioFeaturesForTrack(trackId))
-        )
+        batch.map((trackId) => spotifyApi.getAudioFeaturesForTrack(trackId))
       );
       results.push(...audioFeatures);
     } catch (error) {
@@ -195,7 +162,6 @@ async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 20) {
   return results;
 }
 
-// Get user's playlists
 export const getPlaylists = async () => {
   const session = await getServerSession(authOptions);
 
@@ -206,13 +172,13 @@ export const getPlaylists = async () => {
   spotifyApi.setAccessToken(session.user.accessToken);
 
   try {
-    const playlists = await retryAsync(() => spotifyApi.getUserPlaylists());
+    const playlists = await spotifyApi.getUserPlaylists();
 
     const formattedPlaylists: Playlist[] = await Promise.all(
-      playlists.body.items.map(async (playlist: any) => {
+      playlists.body.items.map(async (playlist) => {
         const {
           body: { followers },
-        } = await retryAsync(() => spotifyApi.getPlaylist(playlist.id));
+        } = await spotifyApi.getPlaylist(playlist.id);
         return formatPlaylistData({
           ...playlist,
           followers: { total: followers.total },
