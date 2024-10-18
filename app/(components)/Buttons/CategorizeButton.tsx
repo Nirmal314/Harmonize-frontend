@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useTransition } from "react";
+import React, { useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Sparkles from "../Sparkles";
 import SparkleButton from "./SparkleButton";
@@ -10,25 +10,19 @@ const Categorize = ({ playlistId }: { playlistId: string }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const navigateToCategorizedPage = () => {
-    startTransition(() => {
-      const promise = () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve({ name: "Sonner" }), 2500)
-        );
+  const navigateToCategorizedPage = useCallback(() => {
+    const toastId = toast.loading("Categorizing your playlist...✨", {
+      duration: Infinity,
+    });
 
-      toast.promise(promise, {
-        loading: "Categorizing your playlist...✨",
-        success: () => {
-          return `Your playlist has been categorized!`;
-        },
-        error: "Error",
-      });
+    startTransition(() => {
       const params = new URLSearchParams();
       params.set("playlistId", playlistId);
       router.push(`/categorized-songs?${params.toString()}`);
+
+      sessionStorage.setItem("categorizingToastId", toastId as string);
     });
-  };
+  }, [playlistId, router]);
 
   return (
     <>

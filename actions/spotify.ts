@@ -2,7 +2,6 @@
 
 import { getServerSession } from "next-auth/next";
 import SpotifyWebApi from "spotify-web-api-node";
-import { cache } from "react";
 import { Playlist, Song, SpotifyPlaylist } from "@/typings";
 import { predictSongCategory } from "@/actions/categorize";
 import { authOptions } from "@/lib/auth";
@@ -149,10 +148,10 @@ export const getPlaylists = async () => {
   spotifyApi.setAccessToken(session.user.accessToken);
 
   try {
-    const data = await spotifyApi.getUserPlaylists();
+    const playlists = await spotifyApi.getUserPlaylists();
 
     const formattedPlaylists: Playlist[] = await Promise.all(
-      data.body.items.map(async (playlist) => {
+      playlists.body.items.map(async (playlist) => {
         const {
           body: { followers },
         } = await spotifyApi.getPlaylist(playlist.id);

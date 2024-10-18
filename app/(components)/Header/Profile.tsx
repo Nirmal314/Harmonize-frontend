@@ -16,6 +16,7 @@ import { Session } from "next-auth";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import LogoutButton from "../Buttons/LogoutButton";
+import Placeholder from "@/public/placeholder-image.png";
 
 const Profile = ({ session }: { session: Session | null }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +33,9 @@ const Profile = ({ session }: { session: Session | null }) => {
           >
             <Avatar className="h-9 w-9">
               <AvatarImage
-                src={session?.user.image || "/placeholder-avatar.png"}
+                src={
+                  session?.user.image || "../../../public/placeholder-image.png"
+                }
                 alt={session?.user.name || "User"}
               />
               <AvatarFallback className="bg-primary/10 text-primary">
@@ -53,7 +56,7 @@ const Profile = ({ session }: { session: Session | null }) => {
             <div className="flex flex-row items-center space-x-3 p-2">
               <div className="relative h-16 w-16 rounded-full overflow-hidden">
                 <Image
-                  src={session?.user.image || "/placeholder-avatar.png"}
+                  src={session?.user.image || Placeholder}
                   alt={session?.user.name || "User"}
                   layout="fill"
                   objectFit="cover"
