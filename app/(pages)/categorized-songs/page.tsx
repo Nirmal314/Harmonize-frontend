@@ -21,13 +21,8 @@ const CategorizedSongsPage = async ({
   try {
     const data = await getPlaylistData(playlistId);
 
-    if (!data) {
-      return (
-        <ErrorToast
-          error="No playlist data found. Please try again."
-          redirect="/playlists"
-        />
-      );
+    if (data.error) {
+      return <ErrorToast error={data.message} redirect="/playlists" />;
     }
 
     const { playlistName = "Unknown Playlist", songs = [] }: PlaylistData =

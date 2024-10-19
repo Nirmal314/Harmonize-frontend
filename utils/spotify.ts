@@ -18,14 +18,20 @@ export const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
 });
 
 export const handleSpotifyApiError = (error: any) => {
+  console.log("ERROR:", error);
   if (error?.response?.status === 401) {
     console.error("Unauthorized error: Spotify token expired", error);
-    throw new Error("Unauthorized: Spotify token expired.");
+    // throw new Error("Unauthorized: Spotify token expired.");
   }
   if (error?.response?.status === 429) {
-    console.error("Rate limit hit, please try again later.", error);
-    throw new Error("Spotify rate limit exceeded, please try again later.");
+    const retryAfter = error.response.headers["retry-after"];
+    const waitTime = retryAfter ? parseInt(retryAfter, 10) : 60; // Default to 60 seconds if 'Retry-After' is not provided
+    console.error(
+      `Rate limit hit, please try again after ${waitTime} seconds.`,
+      error
+    );
+    // throw new Error(`Spotify rate limit exceeded. Retry after ${waitTime} seconds.`);
   }
   console.error("Error fetching Spotify data:", error);
-  throw new Error(`Failed to fetch Spotify data: ${error.message || error}`);
+  // throw new Error(`Failed to fetch Spotify data: ${error.message || error}`);
 };

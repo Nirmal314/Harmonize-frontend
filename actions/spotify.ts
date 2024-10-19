@@ -39,14 +39,30 @@ export const getPlaylistData = async (playlistId: string) => {
       trackIds as string[]
     );
 
-    const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
+    if (audioFeatures.error) {
+      switch (audioFeatures.error.statusCode) {
+        case 429:
+          return {
+            error: audioFeatures.error,
+            message:
+              "Rate limit for Spotify API is hit, please try again later",
+          };
 
-    return {
-      playlistName: playlist.body.name,
-      songs: songs.filter(Boolean),
-    };
+        default:
+          break;
+      }
+      return audioFeatures.error;
+    } else {
+      const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
+
+      return {
+        playlistName: playlist.body.name,
+        songs: songs.filter(Boolean),
+      };
+    }
   } catch (error: any) {
-    handleSpotifyApiError(error);
+    console.log("ERROR: ", error.response);
+    // handleSpotifyApiError(error);
   }
 };
 
@@ -133,6 +149,7 @@ const getPredictionForTrack = async (audioFeature: any) => {
 
 async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 40) {
   const results = [];
+
   for (let i = 0; i < trackIds.length; i += batchSize) {
     const batch = trackIds.slice(i, i + batchSize);
     try {
@@ -142,10 +159,9 @@ async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 40) {
       results.push(...audioFeatures);
     } catch (error) {
       console.error("Error fetching audio features", error);
-      throw new Error("Failed to fetch audio features.");
+      return { error };
     }
 
-    // Wait to prevent hitting rate limits
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   return results;
