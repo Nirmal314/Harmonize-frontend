@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
     secret: process.env.JWT_SECRET,
   });
 
-  console.log("[middleware] token: ", token);
+  console.log("[middleware] user: ", token?.name);
 
   const { pathname } = request.nextUrl;
 

@@ -35,34 +35,22 @@ export const getPlaylistData = async (playlistId: string) => {
 
     const trackIds = tracks.map((track) => track.track?.id).filter(Boolean);
 
-    const audioFeatures = await fetchAudioFeaturesInBatches(
-      trackIds as string[]
-    );
+    const audioFeatures = await fetchAudioFeatures(trackIds as string[]);
 
-    if (audioFeatures.error) {
-      switch (audioFeatures.error.statusCode) {
-        case 429:
-          return {
-            error: audioFeatures.error,
-            message:
-              "Rate limit for Spotify API is hit, please try again later",
-          };
+    if ("error" in audioFeatures) {
+      const error = audioFeatures.error;
+      const message = handleSpotifyApiError(error);
 
-        default:
-          break;
-      }
-      return audioFeatures.error;
+      return { error, message };
     } else {
       const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
-
       return {
         playlistName: playlist.body.name,
         songs: songs.filter(Boolean),
       };
     }
   } catch (error: any) {
-    console.log("ERROR: ", error.response);
-    // handleSpotifyApiError(error);
+    handleSpotifyApiError(error);
   }
 };
 
@@ -87,17 +75,7 @@ const createSongFromTrack = async (
 ) => {
   if (!audioFeature) {
     console.warn(`No audio feature for track ${track.track?.id}`);
-    return {
-      image: track.track?.album.images[0]?.url || "",
-      url: track.track?.external_urls.spotify || "",
-      name: track.track?.name || "Unknown Name",
-      artist:
-        track.track?.artists.map((artist) => artist.name).join(", ") ||
-        "Unknown Artist",
-      album: track.track?.album.name || "Unknown Album",
-      duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
-      category: "Unknown",
-    } as Song;
+    return null;
   }
 
   const prediction = await getPredictionForTrack(audioFeature);
@@ -143,27 +121,38 @@ const getPredictionForTrack = async (audioFeature: any) => {
   } catch (error: any) {
     console.error(error);
     console.error("Error in prediction API", error.message);
-    return null; // Return null if there's an error or a timeout
+    return null;
   }
 };
 
-async function fetchAudioFeaturesInBatches(trackIds: string[], batchSize = 40) {
+async function fetchAudioFeatures(trackIds: string[]) {
   const results = [];
 
-  for (let i = 0; i < trackIds.length; i += batchSize) {
-    const batch = trackIds.slice(i, i + batchSize);
-    try {
-      const audioFeatures = await Promise.all(
-        batch.map((trackId) => spotifyApi.getAudioFeaturesForTrack(trackId))
-      );
-      results.push(...audioFeatures);
-    } catch (error) {
-      console.error("Error fetching audio features", error);
-      return { error };
+  for (const trackId of trackIds) {
+    while (true) {
+      try {
+        const audioFeature = await spotifyApi.getAudioFeaturesForTrack(trackId);
+        results.push(audioFeature);
+        break;
+      } catch (error: any) {
+        if (error?.statusCode === 429) {
+          const retryAfter =
+            parseInt(error.headers["retry-after"], 10) * 1000 || 5000;
+          console.warn(
+            `Rate limit hit for track ${trackId}, retrying after ${retryAfter}ms`
+          );
+          await new Promise((resolve) => setTimeout(resolve, retryAfter));
+        } else {
+          console.error(
+            `Failed to fetch audio feature for track ${trackId}:`,
+            error
+          );
+          return { error };
+        }
+      }
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
+
   return results;
 }
 

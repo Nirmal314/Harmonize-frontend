@@ -17,21 +17,61 @@ export const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
   collaborative: playlist.collaborative,
 });
 
+export const formatDuration = (seconds: number) => {
+  let days = Math.floor(seconds / 86400);
+  seconds %= 86400;
+  let hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  let minutes = Math.floor(seconds / 60);
+  seconds %= 60;
+
+  let result = [];
+  if (days > 0) result.push(`${days} day${days > 1 ? "s" : ""}`);
+  if (hours > 0) result.push(`${hours} hour${hours > 1 ? "s" : ""}`);
+  if (minutes > 0) result.push(`${minutes} minute${minutes > 1 ? "s" : ""}`);
+  if (seconds > 0 || result.length === 0)
+    result.push(`${seconds} second${seconds > 1 ? "s" : ""}`);
+
+  return result.join(", ");
+};
+
 export const handleSpotifyApiError = (error: any) => {
-  console.log("ERROR:", error);
-  if (error?.response?.status === 401) {
-    console.error("Unauthorized error: Spotify token expired", error);
-    // throw new Error("Unauthorized: Spotify token expired.");
+  let message = "Error fetching Spotify data";
+
+  switch (error.statusCode) {
+    case 400:
+      message = "Bad Request: Invalid request made to Spotify API.";
+      break;
+    case 401:
+      message = "Unauthorized";
+      break;
+    case 403:
+      message =
+        "Forbidden: You do not have permission to access this resource.";
+      break;
+    case 404:
+      message = "Not Found: The requested resource could not be found.";
+      break;
+    case 429:
+      const retryAfter = formatDuration(Number(error.headers["retry-after"]));
+      message = `Rate limit hit, please try again after ${retryAfter}.`;
+      break;
+    case 500:
+      message = "Internal Server Error: Spotify is currently unavailable.";
+      break;
+    case 502:
+      message = "Bad Gateway: Invalid response from an upstream server.";
+      break;
+    case 503:
+      message = "Service Unavailable: Spotify servers are temporarily offline.";
+      break;
+    case 504:
+      message =
+        "Gateway Timeout: Spotify servers are taking too long to respond.";
+      break;
   }
-  if (error?.response?.status === 429) {
-    const retryAfter = error.response.headers["retry-after"];
-    const waitTime = retryAfter ? parseInt(retryAfter, 10) : 60; // Default to 60 seconds if 'Retry-After' is not provided
-    console.error(
-      `Rate limit hit, please try again after ${waitTime} seconds.`,
-      error
-    );
-    // throw new Error(`Spotify rate limit exceeded. Retry after ${waitTime} seconds.`);
-  }
-  console.error("Error fetching Spotify data:", error);
-  // throw new Error(`Failed to fetch Spotify data: ${error.message || error}`);
+
+  console.error({ message, error });
+
+  return message;
 };

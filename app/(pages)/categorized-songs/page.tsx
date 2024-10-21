@@ -1,5 +1,4 @@
 import React from "react";
-import { redirect } from "next/navigation";
 import CategorizedSongs from "@/app/(components)/CategorizedSongsDT/CategorizedSongs";
 import { Song } from "@/typings";
 import { getPlaylistData } from "@/actions/spotify";
@@ -16,24 +15,53 @@ const CategorizedSongsPage = async ({
   searchParams?: { [key: string]: string | undefined };
 }) => {
   const playlistId = searchParams?.playlistId;
-  if (!playlistId) redirect("/playlists");
+
+  if (!playlistId)
+    return (
+      <>
+        <ToastManager />
+        <ErrorToast
+          error="PlaylistID is required to categorize your songs inside it."
+          redirect="/playlists"
+        />
+      </>
+    );
 
   try {
     const data = await getPlaylistData(playlistId);
 
-    if (data.error) {
-      return <ErrorToast error={data.message} redirect="/playlists" />;
+    if (!data) {
+      return (
+        <>
+          <ToastManager playlistId={playlistId} />
+          <ErrorToast
+            error="Failed to load playlist data."
+            redirect="/playlists"
+          />
+        </>
+      );
     }
 
-    const { playlistName = "Unknown Playlist", songs = [] }: PlaylistData =
-      data;
+    if ("error" in data) {
+      return (
+        <>
+          <ToastManager playlistId={playlistId} />
+          <ErrorToast error={data.message!} redirect="/playlists" />
+        </>
+      );
+    }
+
+    const { playlistName, songs }: PlaylistData = data;
 
     if (!Array.isArray(songs) || songs.length === 0) {
       return (
-        <ErrorToast
-          error="No songs found in this playlist."
-          redirect="/playlists"
-        />
+        <>
+          <ToastManager playlistId={playlistId} />
+          <ErrorToast
+            error="No songs found in this playlist."
+            redirect="/playlists"
+          />
+        </>
       );
     }
 
@@ -59,7 +87,10 @@ const CategorizedSongsPage = async ({
     return (
       <>
         <ToastManager playlistId={playlistId} />
-        <ErrorToast error={error.message} redirect="/playlists" />
+        <ErrorToast
+          error={error || "An error occurred please try again"}
+          redirect="/playlists"
+        />
       </>
     );
   }
