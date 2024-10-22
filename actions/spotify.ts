@@ -37,20 +37,14 @@ export const getPlaylistData = async (playlistId: string) => {
 
     const audioFeatures = await fetchAudioFeatures(trackIds as string[]);
 
-    if ("error" in audioFeatures) {
-      const error = audioFeatures.error;
-      const message = handleSpotifyApiError(error);
+    const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
 
-      return { error, message };
-    } else {
-      const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
-      return {
-        playlistName: playlist.body.name,
-        songs: songs.filter(Boolean),
-      };
-    }
+    return {
+      playlistName: playlist.body.name,
+      songs: songs.filter(Boolean),
+    };
   } catch (error: any) {
-    handleSpotifyApiError(error);
+    throw new Error(handleSpotifyApiError(error));
   }
 };
 
@@ -63,10 +57,9 @@ const getSongsWithAudioFeatures = async (
     return createSongFromTrack(track, audioFeature);
   });
 
-  const results = await Promise.allSettled(songPromises);
-  return results
-    .filter((result) => result.status === "fulfilled")
-    .map((result) => (result as PromiseFulfilledResult<Song>).value);
+  const results = await Promise.all(songPromises);
+
+  return results.filter(Boolean) as Song[];
 };
 
 const createSongFromTrack = async (
@@ -80,26 +73,19 @@ const createSongFromTrack = async (
 
   const prediction = await getPredictionForTrack(audioFeature);
 
-  return {
-    image: track.track?.album.images[0]?.url || "",
-    url: track.track?.external_urls.spotify || "",
-    name: track.track?.name || "Unknown Name",
-    artist:
-      track.track?.artists.map((artist) => artist.name).join(", ") ||
-      "Unknown Artist",
-    album: track.track?.album.name || "Unknown Album",
-    duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
-    category: prediction?.predicted_category || "Unknown",
-  } as Song;
-};
+  if (prediction && prediction.predicted_category) {
+    return {
+      image: track.track?.album.images[0]?.url || "",
+      url: track.track?.external_urls.spotify,
+      name: track.track?.name,
+      artist: track.track?.artists.map((artist) => artist.name).join(", "),
+      album: track.track?.album.name,
+      duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
+      category: prediction.predicted_category,
+    } as Song;
+  }
 
-const timeoutPromise = (ms: number) =>
-  new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Timeout error")), ms)
-  );
-
-const withTimeout = (promise: Promise<any>, ms: number) => {
-  return Promise.race([promise, timeoutPromise(ms)]);
+  return null;
 };
 
 const getPredictionForTrack = async (audioFeature: any) => {
@@ -108,20 +94,16 @@ const getPredictionForTrack = async (audioFeature: any) => {
   }
 
   try {
-    return await withTimeout(
-      predictSongCategory({
-        danceability: audioFeature.danceability,
-        acousticness: audioFeature.acousticness,
-        valence: audioFeature.valence,
-        tempo: audioFeature.tempo,
-        energy: audioFeature.energy,
-      }),
-      10000
-    );
+    return await predictSongCategory({
+      danceability: audioFeature.danceability,
+      acousticness: audioFeature.acousticness,
+      valence: audioFeature.valence,
+      tempo: audioFeature.tempo,
+      energy: audioFeature.energy,
+    });
   } catch (error: any) {
-    console.error(error);
     console.error("Error in prediction API", error.message);
-    return null;
+    throw error;
   }
 };
 
@@ -147,7 +129,7 @@ async function fetchAudioFeatures(trackIds: string[]) {
             `Failed to fetch audio feature for track ${trackId}:`,
             error
           );
-          return { error };
+          throw error;
         }
       }
     }
@@ -181,8 +163,7 @@ export const getPlaylists = async () => {
     );
 
     return formattedPlaylists;
-  } catch (error) {
-    console.error("Error fetching Spotify data:", error);
-    throw new Error("Failed to fetch Spotify data");
+  } catch (error: any) {
+    throw new Error(handleSpotifyApiError(error));
   }
 };

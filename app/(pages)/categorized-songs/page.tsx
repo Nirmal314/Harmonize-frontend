@@ -17,53 +17,19 @@ const CategorizedSongsPage = async ({
   const playlistId = searchParams?.playlistId;
 
   if (!playlistId)
-    return (
-      <>
-        <ToastManager />
-        <ErrorToast
-          error="PlaylistID is required to categorize your songs inside it."
-          redirect="/playlists"
-        />
-      </>
+    throw new Error(
+      "PlaylistID is required to categorize your songs inside it."
     );
 
   try {
     const data = await getPlaylistData(playlistId);
 
-    if (!data) {
-      return (
-        <>
-          <ToastManager playlistId={playlistId} />
-          <ErrorToast
-            error="Failed to load playlist data."
-            redirect="/playlists"
-          />
-        </>
-      );
-    }
-
-    if ("error" in data) {
-      return (
-        <>
-          <ToastManager playlistId={playlistId} />
-          <ErrorToast error={data.message!} redirect="/playlists" />
-        </>
-      );
-    }
+    if (!data) throw new Error("Failed to load playlist data.");
 
     const { playlistName, songs }: PlaylistData = data;
 
-    if (!Array.isArray(songs) || songs.length === 0) {
-      return (
-        <>
-          <ToastManager playlistId={playlistId} />
-          <ErrorToast
-            error="No songs found in this playlist."
-            redirect="/playlists"
-          />
-        </>
-      );
-    }
+    if (!Array.isArray(songs) || songs.length === 0)
+      throw new Error("No songs found in this playlist.");
 
     return (
       <>
@@ -84,15 +50,7 @@ const CategorizedSongsPage = async ({
       </>
     );
   } catch (error: any) {
-    return (
-      <>
-        <ToastManager playlistId={playlistId} />
-        <ErrorToast
-          error={error || "An error occurred please try again"}
-          redirect="/playlists"
-        />
-      </>
-    );
+    throw new Error(error || "An error occurred please try again");
   }
 };
 
