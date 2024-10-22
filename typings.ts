@@ -47,8 +47,7 @@ export type Song = {
     | "Calm"
     | "Energetic"
     | "Confident"
-    | "Instrumental"
-    | "Unknown";
+    | "Instrumental";
 };
 
 export type Category =
