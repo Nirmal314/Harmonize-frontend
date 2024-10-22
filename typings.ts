@@ -26,14 +26,6 @@ export type Playlist = {
   collaborative: boolean;
 };
 
-export type InputSongAudioFeatures = {
-  danceability: number;
-  energy: number;
-  acousticness: number;
-  valence: number;
-  tempo: number;
-};
-
 export type Song = {
   image: string;
   name: string;
@@ -41,13 +33,7 @@ export type Song = {
   artist: string;
   album: string;
   duration: string;
-  category:
-    | "Happy"
-    | "Sad"
-    | "Calm"
-    | "Energetic"
-    | "Confident"
-    | "Instrumental";
+  category: Category;
 };
 
 export type Category =
@@ -69,4 +55,5 @@ export type Features = {
   acousticness: number;
   valence: number;
   tempo: number;
+  instrumentalness: number;
 };

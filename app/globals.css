@@ -396,7 +396,7 @@
   }
 
   .sparkle-button:hover {
-    background: transparent;
+    background: #9233ea20;
     color: #9333ea;
     box-shadow: 0 0 25px #9333ea8c;
   }

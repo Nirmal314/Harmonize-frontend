@@ -2,8 +2,8 @@
 
 import { getServerSession } from "next-auth/next";
 import SpotifyWebApi from "spotify-web-api-node";
-import { Playlist, Song } from "@/typings";
-import { predictSongCategory } from "@/actions/categorize";
+import { Features, Playlist, Song } from "@/typings";
+import { predict } from "@/actions/categorize";
 import { authOptions } from "@/lib/auth";
 import {
   msToMinutesAndSeconds,
@@ -16,8 +16,9 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
 
-export const getPlaylistData = async (playlistId: string) => {
+export const getPlaylists = async () => {
   const session = await getServerSession(authOptions);
+
   if (!session || !session.user.accessToken) {
     throw new Error("Unauthorized: Missing session or access token.");
   }
@@ -28,124 +29,6 @@ export const getPlaylistData = async (playlistId: string) => {
     console.error("Error setting access token:", error);
     throw new Error("Failed to set Spotify access token.");
   }
-
-  try {
-    const playlist = await spotifyApi.getPlaylist(playlistId);
-    const tracks = playlist.body.tracks.items;
-
-    const trackIds = tracks.map((track) => track.track?.id).filter(Boolean);
-
-    const audioFeatures = await fetchAudioFeatures(trackIds as string[]);
-
-    const songs = await getSongsWithAudioFeatures(tracks, audioFeatures);
-
-    return {
-      playlistName: playlist.body.name,
-      songs: songs.filter(Boolean),
-    };
-  } catch (error: any) {
-    throw new Error(handleSpotifyApiError(error));
-  }
-};
-
-const getSongsWithAudioFeatures = async (
-  tracks: SpotifyApi.PlaylistTrackObject[],
-  audioFeatures: any
-) => {
-  const songPromises = tracks.map((track, index) => {
-    const audioFeature = audioFeatures[index]?.body;
-    return createSongFromTrack(track, audioFeature);
-  });
-
-  const results = await Promise.all(songPromises);
-
-  return results.filter(Boolean) as Song[];
-};
-
-const createSongFromTrack = async (
-  track: SpotifyApi.PlaylistTrackObject,
-  audioFeature: any
-) => {
-  if (!audioFeature) {
-    console.warn(`No audio feature for track ${track.track?.id}`);
-    return null;
-  }
-
-  const prediction = await getPredictionForTrack(audioFeature);
-
-  if (prediction && prediction.predicted_category) {
-    return {
-      image: track.track?.album.images[0]?.url || "",
-      url: track.track?.external_urls.spotify,
-      name: track.track?.name,
-      artist: track.track?.artists.map((artist) => artist.name).join(", "),
-      album: track.track?.album.name,
-      duration: msToMinutesAndSeconds(track.track?.duration_ms || 0),
-      category: prediction.predicted_category,
-    } as Song;
-  }
-
-  return null;
-};
-
-const getPredictionForTrack = async (audioFeature: any) => {
-  if (audioFeature.instrumentalness > 0.6) {
-    return { predicted_category: "instrumental" };
-  }
-
-  try {
-    return await predictSongCategory({
-      danceability: audioFeature.danceability,
-      acousticness: audioFeature.acousticness,
-      valence: audioFeature.valence,
-      tempo: audioFeature.tempo,
-      energy: audioFeature.energy,
-    });
-  } catch (error: any) {
-    console.error("Error in prediction API", error.message);
-    throw error;
-  }
-};
-
-async function fetchAudioFeatures(trackIds: string[]) {
-  const results = [];
-
-  for (const trackId of trackIds) {
-    while (true) {
-      try {
-        const audioFeature = await spotifyApi.getAudioFeaturesForTrack(trackId);
-        results.push(audioFeature);
-        break;
-      } catch (error: any) {
-        if (error?.statusCode === 429) {
-          const retryAfter =
-            parseInt(error.headers["retry-after"], 10) * 1000 || 5000;
-          console.warn(
-            `Rate limit hit for track ${trackId}, retrying after ${retryAfter}ms`
-          );
-          await new Promise((resolve) => setTimeout(resolve, retryAfter));
-        } else {
-          console.error(
-            `Failed to fetch audio feature for track ${trackId}:`,
-            error
-          );
-          throw error;
-        }
-      }
-    }
-  }
-
-  return results;
-}
-
-export const getPlaylists = async () => {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user.accessToken) {
-    throw new Error("Unauthorized");
-  }
-
-  spotifyApi.setAccessToken(session.user.accessToken);
 
   try {
     const playlists = await spotifyApi.getUserPlaylists();
@@ -164,6 +47,122 @@ export const getPlaylists = async () => {
 
     return formattedPlaylists;
   } catch (error: any) {
+    if (typeof error === typeof Error) throw error;
+    throw new Error(handleSpotifyApiError(error));
+  }
+};
+
+export const getPlaylistData = async (playlistId: string) => {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user.accessToken) {
+    throw new Error("Unauthorized: Missing session or access token.");
+  }
+
+  try {
+    spotifyApi.setAccessToken(session.user.accessToken);
+  } catch (error) {
+    console.error("Error setting access token:", error);
+    throw new Error("Failed to set Spotify access token.");
+  }
+
+  try {
+    const playlist = await spotifyApi.getPlaylist(playlistId);
+
+    const tracks = playlist.body.tracks.items;
+
+    const audioFeatures = await fetchAudioFeatures(
+      tracks as SpotifyApi.PlaylistTrackObject[]
+    );
+
+    const songs = await predictAndFormat(audioFeatures);
+
+    return {
+      playlistName: playlist.body.name,
+      songs,
+    };
+  } catch (error: any) {
+    if (typeof error === typeof Error) throw error;
+    throw new Error(handleSpotifyApiError(error));
+  }
+};
+
+const fetchAudioFeatures = async (tracks: SpotifyApi.PlaylistTrackObject[]) => {
+  const results = [];
+
+  for (const track of tracks) {
+    let attempts = 0;
+    while (attempts < 5) {
+      if (track.track?.id) {
+        const trackId = track.track.id;
+        try {
+          const audioFeature = await spotifyApi.getAudioFeaturesForTrack(
+            trackId
+          );
+          results.push({
+            track: track.track, // Add track as well
+            danceability: audioFeature.body.danceability,
+            energy: audioFeature.body.energy,
+            acousticness: audioFeature.body.acousticness,
+            valence: audioFeature.body.valence,
+            tempo: audioFeature.body.tempo,
+            instrumentalness: audioFeature.body.instrumentalness,
+          });
+          break;
+        } catch (error: any) {
+          if (error?.statusCode === 429) {
+            const retryAfter =
+              parseInt(error.headers["retry-after"], 10) * 1000 || 5000;
+            console.warn(
+              `Rate limit hit for track ${trackId}, retrying after ${retryAfter}ms (Attempt ${
+                attempts + 1
+              }/5)`
+            );
+            await new Promise((resolve) => setTimeout(resolve, retryAfter));
+          } else {
+            console.error(
+              `Failed to fetch audio feature for track ${trackId}:`,
+              error
+            );
+            throw error;
+          }
+        }
+
+        attempts++;
+
+        if (attempts === 5) {
+          console.error(
+            `Failed to fetch audio feature for track ${trackId} after 5 attempts.`
+          );
+          throw new Error(
+            `Failed to fetch audio features for track ${trackId} after 5 retries.`
+          );
+        }
+      }
+    }
+  }
+
+  return results;
+};
+
+const predictAndFormat = async (audioFeatures: Features[]) => {
+  try {
+    const tracks = await predict(audioFeatures);
+
+    return tracks.map((t) => {
+      const track = t.track;
+
+      return {
+        image: track.album.images[0].url || "",
+        url: track.external_urls.spotify,
+        name: track.name,
+        artist: track.artists.map((artist) => artist.name).join(", "),
+        album: track.album.name,
+        duration: msToMinutesAndSeconds(track.duration_ms || 0),
+        category: track.category,
+      };
+    });
+  } catch (error: any) {
+    if (typeof error === typeof Error) throw error;
     throw new Error(handleSpotifyApiError(error));
   }
 };
