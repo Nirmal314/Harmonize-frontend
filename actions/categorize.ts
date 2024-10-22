@@ -1,21 +1,21 @@
 "use server";
 
-import { InputSongAudioFeatures } from "@/typings";
+import { Features } from "@/typings";
 import { revalidatePath } from "next/cache";
 
 type PredictionResult = {
-  predicted_category:
-    | "happy"
-    | "sad"
-    | "calm"
-    | "energetic"
-    | "confident"
-    | "instrumental";
+  track: SpotifyApi.TrackObjectFull & {
+    category:
+      | "happy"
+      | "sad"
+      | "calm"
+      | "energetic"
+      | "confident"
+      | "instrumental";
+  };
 };
 
-export async function predictSongCategory(
-  input: InputSongAudioFeatures
-): Promise<PredictionResult> {
+export async function predict(inputs: Features[]): Promise<PredictionResult[]> {
   const apiUrl = `${process.env.MODEL_API_URL}/predict`;
 
   try {
@@ -24,7 +24,7 @@ export async function predictSongCategory(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify(inputs),
     });
 
     if (!response.ok) {
@@ -35,7 +35,7 @@ export async function predictSongCategory(
 
     // revalidatePath('/')
 
-    return result as PredictionResult;
+    return result as PredictionResult[];
   } catch (error) {
     console.error("Error calling prediction API:", error);
     throw error;
