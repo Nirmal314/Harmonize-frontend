@@ -16,6 +16,16 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
 
+type AudioFeatureResult = {
+  track: SpotifyApi.TrackObjectFull;
+  danceability: number;
+  energy: number;
+  acousticness: number;
+  valence: number;
+  tempo: number;
+  instrumentalness: number;
+};
+
 export const getPlaylists = async () => {
   const session = await getServerSession(authOptions);
 
@@ -86,58 +96,117 @@ export const getPlaylistData = async (playlistId: string) => {
   }
 };
 
-const fetchAudioFeatures = async (tracks: SpotifyApi.PlaylistTrackObject[]) => {
-  const results = [];
+const BATCH_SIZE = 100; // Spotify allows up to 100 tracks per request
+const MAX_RETRIES = 5;
+const BASE_DELAY = 1000;
+const CONCURRENT_BATCHES = 3;
 
-  for (const track of tracks) {
-    let attempts = 0;
-    while (attempts < 5) {
-      if (track.track?.id) {
-        const trackId = track.track.id;
-        try {
-          const audioFeature = await spotifyApi.getAudioFeaturesForTrack(
-            trackId
-          );
-          results.push({
-            track: track.track, // Add track as well
-            danceability: audioFeature.body.danceability,
-            energy: audioFeature.body.energy,
-            acousticness: audioFeature.body.acousticness,
-            valence: audioFeature.body.valence,
-            tempo: audioFeature.body.tempo,
-            instrumentalness: audioFeature.body.instrumentalness,
-          });
-          break;
-        } catch (error: any) {
-          if (error?.statusCode === 429) {
-            const retryAfter =
-              parseInt(error.headers["retry-after"], 10) * 1000 || 5000;
-            console.warn(
-              `Rate limit hit for track ${trackId}, retrying after ${retryAfter}ms (Attempt ${
-                attempts + 1
-              }/5)`
-            );
-            await new Promise((resolve) => setTimeout(resolve, retryAfter));
-          } else {
-            console.error(
-              `Failed to fetch audio feature for track ${trackId}:`,
-              error
-            );
-            throw error;
-          }
-        }
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-        attempts++;
+const chunk = <T>(array: T[], size: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+};
 
-        if (attempts === 5) {
-          console.error(
-            `Failed to fetch audio feature for track ${trackId} after 5 attempts.`
-          );
-          throw new Error(
-            `Failed to fetch audio features for track ${trackId} after 5 retries.`
-          );
-        }
+const processBatch = async (
+  batch: SpotifyApi.PlaylistTrackObject[],
+  batchIndex: number,
+  totalBatches: number
+): Promise<AudioFeatureResult[]> => {
+  const trackIds = batch.map((track) => track.track!.id);
+  let attempts = 0;
+
+  while (attempts < MAX_RETRIES) {
+    try {
+      const audioFeatures = await spotifyApi.getAudioFeaturesForTracks(
+        trackIds
+      );
+
+      const batchResults = audioFeatures.body.audio_features
+        .map((feature, index) => {
+          if (!feature) return null;
+
+          return {
+            track: batch[index].track!,
+            danceability: feature.danceability,
+            energy: feature.energy,
+            acousticness: feature.acousticness,
+            valence: feature.valence,
+            tempo: feature.tempo,
+            instrumentalness: feature.instrumentalness,
+          };
+        })
+        .filter((result): result is AudioFeatureResult => result !== null);
+
+      console.log(`Completed batch ${batchIndex + 1}/${totalBatches}`);
+      return batchResults;
+    } catch (error: any) {
+      attempts++;
+
+      if (error?.statusCode === 429) {
+        const retryAfter =
+          parseInt(error.headers["retry-after"], 10) * 1000 || 5000;
+        console.warn(
+          `Rate limit hit for batch ${batchIndex + 1}/${totalBatches}, ` +
+            `retrying after ${retryAfter}ms (Attempt ${attempts}/${MAX_RETRIES})`
+        );
+        await sleep(retryAfter);
+        continue;
       }
+
+      if (attempts < MAX_RETRIES) {
+        const backoffDelay = BASE_DELAY * Math.pow(2, attempts - 1);
+        console.warn(
+          `Error fetching batch ${batchIndex + 1}/${totalBatches}, ` +
+            `retrying in ${backoffDelay}ms (Attempt ${attempts}/${MAX_RETRIES})`,
+          error
+        );
+        await sleep(backoffDelay);
+        continue;
+      }
+
+      console.error(
+        `Failed to fetch audio features for batch ${
+          batchIndex + 1
+        }/${totalBatches} ` + `after ${MAX_RETRIES} attempts:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  throw new Error(
+    `Failed to process batch ${batchIndex + 1} after ${MAX_RETRIES} attempts`
+  );
+};
+
+const fetchAudioFeatures = async (
+  tracks: SpotifyApi.PlaylistTrackObject[]
+): Promise<AudioFeatureResult[]> => {
+  const validTracks = tracks.filter((track) => track.track?.id);
+  const batches = chunk(validTracks, BATCH_SIZE);
+  const results: AudioFeatureResult[] = [];
+
+  for (let i = 0; i < batches.length; i += CONCURRENT_BATCHES) {
+    const currentBatches = batches.slice(i, i + CONCURRENT_BATCHES);
+    const batchPromises = currentBatches.map((batch, index) =>
+      processBatch(batch, i + index, batches.length)
+    );
+
+    try {
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults.flat());
+
+      // Add a small delay between concurrent batch groups
+      if (i + CONCURRENT_BATCHES < batches.length) {
+        await sleep(100);
+      }
+    } catch (error) {
+      console.error("Error processing concurrent batch group:", error);
+      throw error;
     }
   }
 
@@ -150,14 +219,13 @@ const predictAndFormat = async (audioFeatures: Features[]) => {
 
     return tracks.map((t) => {
       const track = t.track;
-
       return {
-        image: track.album.images[0].url || "",
+        image: track.album?.images[0]?.url || "",
         url: track.external_urls.spotify,
         name: track.name,
         artist: track.artists.map((artist) => artist.name).join(", "),
         album: track.album.name,
-        duration: msToMinutesAndSeconds(track.duration_ms || 0),
+        duration: msToMinutesAndSeconds(track?.duration_ms || 0),
         category: track.category,
       };
     });
