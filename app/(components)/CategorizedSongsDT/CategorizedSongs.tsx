@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowLeft, ArrowRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +32,14 @@ import {
 } from "@/components/ui/table";
 import { columns } from "./columns";
 import { Song } from "@/typings";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -171,23 +179,101 @@ const CategorizedSongs = ({ songs }: { songs: Song[] }) => {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          className="bg-transparent rounded-full border hover:border-primary hover:text-black border-gray-700"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          aria-label="Previous page"
-        >
-          <ArrowLeft />
-        </Button>
-        <Button
-          className="bg-transparent rounded-full border hover:border-primary hover:text-black border-gray-700"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          aria-label="Next page"
-        >
-          <ArrowRight />
-        </Button>
+      <div className="flex flex-col sm:flex-row items-center justify-between sm:justify-end space-y-2 sm:space-y-0 sm:space-x-2 py-4">
+        <Pagination>
+          <PaginationContent className="flex-wrap justify-center hidden md:flex">
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                className={`rounded-full hover:text-primary hover:bg-primary/15 border border-transparent hover:border-primary ${
+                  !table.getCanPreviousPage()
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  e.preventDefault();
+                  if (table.getCanPreviousPage()) table.previousPage();
+                }}
+                aria-disabled={!table.getCanPreviousPage()}
+              />
+            </PaginationItem>
+
+            {Array.from({ length: table.getPageCount() }, (_, i) => i + 1).map(
+              (page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href="#"
+                    className={`border-primary bg-primary/15 rounded-full text-primary hover:bg-bg-primary/15 hover:text-primary ${
+                      table.getState().pagination.pageIndex === page - 1
+                        ? "font-bold"
+                        : ""
+                    }`}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => {
+                      e.preventDefault();
+                      table.setPageIndex(page - 1);
+                    }}
+                    isActive={
+                      table.getState().pagination.pageIndex === page - 1
+                    }
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            )}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                className={`rounded-full hover:text-primary hover:bg-primary/15 border border-transparent hover:border-primary ${
+                  !table.getCanNextPage() ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  e.preventDefault();
+                  if (table.getCanNextPage()) table.nextPage();
+                }}
+                aria-disabled={!table.getCanNextPage()}
+              />
+            </PaginationItem>
+          </PaginationContent>
+
+          <PaginationContent className="flex md:hidden items-center justify-between w-full">
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                className={`rounded-full hover:text-primary hover:bg-primary/15 border border-transparent hover:border-primary ${
+                  !table.getCanPreviousPage()
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  e.preventDefault();
+                  if (table.getCanPreviousPage()) table.previousPage();
+                }}
+                aria-disabled={!table.getCanPreviousPage()}
+              />
+            </PaginationItem>
+
+            <span className="text-sm text-gray-100 border-b border-b-primary">
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </span>
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                className={`rounded-full hover:text-primary hover:bg-primary/15 border border-transparent hover:border-primary ${
+                  !table.getCanNextPage() ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  e.preventDefault();
+                  if (table.getCanNextPage()) table.nextPage();
+                }}
+                aria-disabled={!table.getCanNextPage()}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

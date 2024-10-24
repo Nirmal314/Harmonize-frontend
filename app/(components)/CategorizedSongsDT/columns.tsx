@@ -123,13 +123,13 @@ export const columns: ColumnDef<Song, any>[] = [
       );
     },
     cell: ({ row }) => (
-      <span
-        className={`px-2 py-1 rounded-full text-xs font-semibold ${getCategoryColor(
+      <p
+        className={`px-2 py-1 rounded-full w-24 text-center text-xs font-semibold ${getCategoryColor(
           row.getValue("category")
         )} hover:opacity-80 transition-opacity`}
       >
         {row.getValue("category")}
-      </span>
+      </p>
     ),
     size: 120,
   },
