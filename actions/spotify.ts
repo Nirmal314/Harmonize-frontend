@@ -76,13 +76,28 @@ export const getPlaylistData = async (playlistId: string) => {
   }
 
   try {
-    const playlist = await spotifyApi.getPlaylist(playlistId);
+    let tracks: SpotifyApi.PlaylistTrackObject[] = [];
+    let offset = 0;
+    const limit = 100; // Maximum number of tracks per request
+    let totalTracks = 0;
 
-    const tracks = playlist.body.tracks.items;
+    const playlist = await spotifyApi.getPlaylist(playlistId, {
+      fields: "tracks.total,name",
+    });
 
-    const audioFeatures = await fetchAudioFeatures(
-      tracks as SpotifyApi.PlaylistTrackObject[]
-    );
+    totalTracks = playlist.body.tracks.total;
+    while (offset < totalTracks) {
+      const response = await spotifyApi.getPlaylistTracks(playlistId, {
+        offset,
+        limit,
+      });
+      tracks = tracks.concat(
+        response.body.items as SpotifyApi.PlaylistTrackObject[]
+      );
+      offset += limit;
+    }
+
+    const audioFeatures = await fetchAudioFeatures(tracks);
 
     const songs = await predictAndFormat(audioFeatures);
 
