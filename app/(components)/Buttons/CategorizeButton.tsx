@@ -26,7 +26,7 @@ const Categorize = ({ playlistId }: { playlistId: string }) => {
 
   return (
     <>
-      <div className="relative">
+      <div className="relative flex items-center justify-center">
         <SparkleButton
           handler={navigateToCategorizedPage}
           isDisabled={isPending}

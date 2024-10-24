@@ -38,6 +38,7 @@ const PlaylistLoadingCard = () => (
       <div className="flex justify-between w-full space-x-4">
         <Button className="w-full bg-gray-600 animate-pulse hover:bg-gray-600"></Button>
         <Button className="w-full bg-gray-600 animate-pulse hover:bg-gray-600"></Button>
+        <Button className="w-full bg-gray-600 animate-pulse hover:bg-gray-600"></Button>
       </div>
     </CardFooter>
   </Card>
