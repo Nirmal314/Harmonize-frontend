@@ -25,7 +25,8 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="w-full h-full pt-16 sm:pt-20 flex flex-col items-center justify-center bg-black px-4 py-8">
+    <div className="flex flex-col items-center justify-center w-full h-auto md:h-full">
+      {/* <div className="w-full h-full pt-14 sm:pt-20 flex flex-col items-center justify-center bg-black px-4 py-8"> */}
       <Card className="w-full max-w-sm sm:max-w-lg md:max-w-2xl bg-gray-900 border-gray-800">
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-center justify-center space-x-0 sm:space-x-4">
