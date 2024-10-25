@@ -121,7 +121,7 @@ const Home = ({ searchParams }: Props) => {
         </motion.section>
         <section
           ref={moodCategoriesRef}
-          className="min-h-screen flex items-center justify-center px-4 md:px-6 bg-gray-900"
+          className="min-h-screen flex items-center justify-center px-4 md:px-6"
         >
           <div className="max-w-6xl mx-auto">
             <motion.h2
@@ -151,10 +151,10 @@ const Home = ({ searchParams }: Props) => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center"
             >
               <motion.div variants={itemVariants} className="w-full max-w-sm">
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="border-none bg-[#00000011] backdrop-filter backdrop-blur-xl bg-opacity-60 shadow-[rgba(234,179,8,0.8)_0px_0px_10px_6px]">
                   <CardContent className="flex flex-col items-center p-6">
                     <Smile className={`h-12 w-12 mb-4 text-yellow-500`} />
                     <h3
@@ -169,7 +169,7 @@ const Home = ({ searchParams }: Props) => {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="w-full max-w-sm">
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="border-none bg-[#00000011] backdrop-filter backdrop-blur-xl bg-opacity-60 shadow-[rgba(59,130,246,0.8)_0px_0px_10px_6px]">
                   <CardContent className="flex flex-col items-center p-6">
                     <Frown className={`h-12 w-12 mb-4 text-blue-500`} />
                     <h3
@@ -184,7 +184,7 @@ const Home = ({ searchParams }: Props) => {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="w-full max-w-sm">
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="border-none bg-[#00000011] backdrop-filter backdrop-blur-xl bg-opacity-60 shadow-[rgba(24,216,96,0.8)_0px_0px_10px_6px]">
                   <CardContent className="flex flex-col items-center p-6">
                     <Cloud className={`h-12 w-12 mb-4 text-green-500`} />
                     <h3
@@ -199,7 +199,7 @@ const Home = ({ searchParams }: Props) => {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="w-full max-w-sm">
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="border-none bg-[#00000011] backdrop-filter backdrop-blur-xl bg-opacity-60 shadow-[rgba(239,68,68,0.8)_0px_0px_10px_6px]">
                   <CardContent className="flex flex-col items-center p-6">
                     <Zap className={`h-12 w-12 mb-4 text-red-500`} />
                     <h3
@@ -214,7 +214,7 @@ const Home = ({ searchParams }: Props) => {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="w-full max-w-sm">
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="border-none bg-[#00000011] backdrop-filter backdrop-blur-xl bg-opacity-60 shadow-[rgba(168,85,247,0.8)_0px_0px_10px_6px]">
                   <CardContent className="flex flex-col items-center p-6">
                     <Star className={`h-12 w-12 mb-4 text-purple-500`} />
                     <h3
@@ -229,7 +229,7 @@ const Home = ({ searchParams }: Props) => {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="w-full max-w-sm">
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="border-none bg-[#00000011] backdrop-filter backdrop-blur-xl bg-opacity-60 shadow-[rgba(249,115,22,0.8)_0px_0px_10px_6px]">
                   <CardContent className="flex flex-col items-center p-6">
                     <Mic className={`h-12 w-12 mb-4 text-orange-500`} />
                     <h3
