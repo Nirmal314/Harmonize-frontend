@@ -317,7 +317,7 @@
 
   .sparkle-button {
     position: relative;
-    padding: 12px 35px;
+    width: 100%;
     background: #9333ea;
     font-size: 17px;
     font-weight: 500;

@@ -3,8 +3,9 @@
 import React, { useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Sparkles from "../Sparkles";
-import SparkleButton from "./SparkleButton";
 import { toast } from "sonner";
+import { Wand2 } from "lucide-react";
+import GlowingSparkle from "../GlowingSparkle";
 
 const Categorize = ({ playlistId }: { playlistId: string }) => {
   const [isPending, startTransition] = useTransition();
@@ -26,12 +27,34 @@ const Categorize = ({ playlistId }: { playlistId: string }) => {
 
   return (
     <>
-      <div className="relative flex items-center justify-center">
-        <SparkleButton
-          handler={navigateToCategorizedPage}
-          isDisabled={isPending}
-        />
-        <Sparkles />
+      <div className="relative w-full">
+        <button
+          onClick={navigateToCategorizedPage}
+          disabled={isPending}
+          className="sparkle-button flex justify-center items-center h-9 px-4 py-2 bg-[#9333ea] hover:bg-transparent shadow-purple"
+        >
+          <Wand2 className={`w-4 h-4 text-white`} />
+
+          <div className={`sparkle-star-1`}>
+            <GlowingSparkle />
+          </div>
+          <div className={`sparkle-star-2`}>
+            <GlowingSparkle />
+          </div>
+          <div className={`sparkle-star-3`}>
+            <GlowingSparkle />
+          </div>
+          <div className={`sparkle-star-4`}>
+            <GlowingSparkle />
+          </div>
+          <div className={`sparkle-star-5`}>
+            <GlowingSparkle />
+          </div>
+          <div className={`sparkle-star-6`}>
+            <GlowingSparkle />
+          </div>
+          <Sparkles />
+        </button>
       </div>
     </>
   );

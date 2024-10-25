@@ -25,8 +25,8 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-black p-4">
-      <Card className="w-full max-w-lg sm:max-w-2xl bg-gray-900 border-gray-800">
+    <div className="w-full h-full pt-16 sm:pt-20 flex flex-col items-center justify-center bg-black px-4 py-8">
+      <Card className="w-full max-w-sm sm:max-w-lg md:max-w-2xl bg-gray-900 border-gray-800">
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-center justify-center space-x-0 sm:space-x-4">
             <MusicIcon className="w-12 h-12 text-primary animate-pulse mb-2 sm:mb-0" />

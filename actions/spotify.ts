@@ -75,6 +75,11 @@ export const getPlaylistData = async (playlistId: string) => {
     throw new Error("Failed to set Spotify access token.");
   }
 
+  if (!process.env.MODEL_API_URL || process.env.MODEL_API_URL == "")
+    throw new Error(
+      "Sorry! Backend of Harmonize is currently down, please try again later."
+    );
+
   try {
     let tracks: SpotifyApi.PlaylistTrackObject[] = [];
     let offset = 0;
