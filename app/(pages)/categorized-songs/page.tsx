@@ -5,7 +5,6 @@ import { getPlaylistData } from "@/actions/spotify";
 import { Music } from "lucide-react";
 import Celebrate from "@/app/(components)/Celebrate";
 import ToastManager from "@/app/(components)/ToastManager";
-import { unstable_noStore as noStore } from "next/cache";
 
 type PlaylistData = { playlistName: string; songs: Song[] };
 
@@ -16,7 +15,6 @@ const CategorizedSongsPage = async ({
 }) => {
   const playlistId = searchParams?.playlistId;
 
-  noStore();
   if (!playlistId)
     throw new Error(
       "PlaylistID is required to categorize your songs inside it."
