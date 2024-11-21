@@ -38,7 +38,7 @@ export const formatDuration = (seconds: number) => {
 export const handleSpotifyApiError = (error: any) => {
   let message = "Error fetching Spotify data";
 
-  switch (error.statusCode) {
+  switch (error.statusCode || error.status) {
     case 400:
       message = "Bad Request: Invalid request made to Spotify API.";
       break;

@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -10,25 +6,22 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { MusicIcon, RefreshCcw, AlertTriangle, Home } from "lucide-react";
+import {
+  MusicIcon,
+  RefreshCcw,
+  AlertTriangle,
+  Home,
+  Music,
+} from "lucide-react";
 import Link from "next/link";
 import ToastManager from "./ToastManager";
+import { Button } from "@/components/ui/button";
 
 export default function Error({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
 }) {
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      console.error(error);
-    } else {
-      console.log(`Error occurred: ${error.digest}`);
-    }
-  }, [error]);
-
   return (
     <>
       <ToastManager />
@@ -97,18 +90,14 @@ export default function Error({
               </CardContent>
             </Card>
           </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row justify-between">
-            <Button onClick={reset} className="mb-2 sm:mb-0">
-              <RefreshCcw className="mr-2 h-5 w-5" />
-              <span className="font-bold">Try again</span>
-            </Button>
-            <Link href="/">
+          <CardFooter className="flex flex-col sm:flex-row justify-start space-x-3">
+            <Link href="/playlists">
               <Button
                 variant="outline"
                 className="bg-transparent hover:bg-transparent hover:text-primary border border-primary rounded-full text-primary"
               >
-                <Home className="mr-2 h-5 w-5" />
-                Go to Homepage
+                <Music className="mr-2 h-5 w-5" />
+                Go To Playlists
               </Button>
             </Link>
           </CardFooter>

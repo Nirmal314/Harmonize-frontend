@@ -1,6 +1,7 @@
 "use server";
 
 import { Features } from "@/typings";
+import { handleSpotifyApiError } from "@/utils/spotify";
 import { revalidatePath } from "next/cache";
 
 type PredictionResult = {
@@ -28,7 +29,12 @@ export async function predict(inputs: Features[]): Promise<PredictionResult[]> {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 404) {
+        throw new Error(
+          "Please inform the admin to start the prediction servers. Sorry for the inconvenience!"
+        );
+      }
+      throw new Error(handleSpotifyApiError(response));
     }
 
     const result = await response.json();

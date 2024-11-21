@@ -5,6 +5,7 @@ import { getPlaylistData } from "@/actions/spotify";
 import { Music } from "lucide-react";
 import Celebrate from "@/app/(components)/Celebrate";
 import ToastManager from "@/app/(components)/ToastManager";
+import Error from "@/app/(components)/Error";
 
 type PlaylistData = { playlistName: string; songs: Song[] };
 
@@ -15,20 +16,35 @@ const CategorizedSongsPage = async ({
 }) => {
   const playlistId = searchParams?.playlistId;
 
-  if (!playlistId)
-    throw new Error(
-      "PlaylistID is required to categorize your songs inside it."
+  if (!playlistId) {
+    return (
+      <ToastManager
+        message="PlaylistID is required to categorize your songs inside it."
+        redirect="/playlists"
+      />
     );
+  }
 
   try {
     const data = await getPlaylistData(playlistId);
 
-    if (!data) throw new Error("Failed to load playlist data.");
+    if (!data)
+      return (
+        <ToastManager
+          message={"Failed to load playlist data."}
+          redirect="/playlists"
+        />
+      );
 
     const { playlistName, songs }: PlaylistData = data;
 
     if (!Array.isArray(songs) || songs.length === 0)
-      throw new Error("No songs found in this playlist.");
+      return (
+        <ToastManager
+          message={"No songs found in this playlist."}
+          redirect="/playlists"
+        />
+      );
 
     return (
       <>
@@ -49,7 +65,7 @@ const CategorizedSongsPage = async ({
       </>
     );
   } catch (error: any) {
-    throw new Error(error || "An error occurred please try again");
+    return <Error error={error} />;
   }
 };
 
