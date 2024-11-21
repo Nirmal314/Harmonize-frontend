@@ -53,11 +53,11 @@ export default function Error({
                 <p className="text-gray-300 mt-1">
                   {error.message || "An unexpected error occurred"}
                 </p>
-                {error.digest && (
+                {/* {error.digest && (
                   <p className="text-gray-400 text-sm mt-2">
                     Error ID: {error.digest}
                   </p>
-                )}
+                )} */}
               </div>
             </div>
             <Card className="bg-gray-800 border-gray-700">
@@ -94,7 +94,7 @@ export default function Error({
             </Card>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row justify-between">
-            <Button onClick={() => reset()} className="mb-2 sm:mb-0">
+            <Button onClick={reset} className="mb-2 sm:mb-0">
               <RefreshCcw className="mr-2 h-5 w-5" />
               <span className="font-bold">Try again</span>
             </Button>
