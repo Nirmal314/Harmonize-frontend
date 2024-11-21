@@ -22,7 +22,11 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    if (process.env.NODE_ENV === "development") {
+      console.error(error);
+    } else {
+      console.log(`Error occurred: ${error.digest}`);
+    }
   }, [error]);
 
   return (
@@ -53,11 +57,11 @@ export default function Error({
                 <p className="text-gray-300 mt-1">
                   {error.message || "An unexpected error occurred"}
                 </p>
-                {/* {error.digest && (
+                {error.digest && (
                   <p className="text-gray-400 text-sm mt-2">
                     Error ID: {error.digest}
                   </p>
-                )} */}
+                )}
               </div>
             </div>
             <Card className="bg-gray-800 border-gray-700">
