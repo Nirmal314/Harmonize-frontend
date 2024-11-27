@@ -77,7 +77,7 @@ export const getPlaylistData = async (playlistId: string) => {
 
   if (!process.env.MODEL_API_URL || process.env.MODEL_API_URL == "")
     throw new Error(
-      "Sorry! Backend of Harmonize is currently down, please try again later."
+      "Sorry! Backend server of Harmonize is currently down, please try again later."
     );
 
   try {
@@ -111,8 +111,7 @@ export const getPlaylistData = async (playlistId: string) => {
       songs,
     };
   } catch (error: any) {
-    if (typeof error === typeof Error) throw error;
-    throw new Error(handleSpotifyApiError(error));
+    throw error;
   }
 };
 
@@ -250,7 +249,6 @@ const predictAndFormat = async (audioFeatures: Features[]) => {
       };
     });
   } catch (error: any) {
-    if (typeof error === typeof Error) throw error;
-    throw new Error(handleSpotifyApiError(error));
+    throw error;
   }
 };
