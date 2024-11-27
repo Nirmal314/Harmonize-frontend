@@ -42,8 +42,15 @@ export async function predict(inputs: Features[]): Promise<PredictionResult[]> {
     // revalidatePath('/')
 
     return result as PredictionResult[];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error calling prediction API:", error);
-    throw error;
+
+    if (error.message.toLowerCase() === "fetch failed") {
+      throw new Error(
+        "Please inform the admin to start the prediction servers. Sorry for the inconvenience!"
+      );
+    } else {
+      throw error;
+    }
   }
 }
