@@ -20,7 +20,7 @@ export type Playlist = {
   name: string;
   description: string;
   url: string;
-  image: string | null;
+  image?: string | null;
   trackCount: number;
   followers: number;
   collaborative: boolean;

@@ -11,7 +11,7 @@ export const formatPlaylistData = (playlist: SpotifyPlaylist) => ({
   name: playlist.name,
   description: playlist.description || "No description available",
   url: playlist.external_urls.spotify,
-  image: playlist.images[0]?.url || null,
+  image: playlist.images ? playlist.images[0]?.url : null,
   trackCount: playlist.tracks.total,
   followers: playlist.followers?.total || 0,
   collaborative: playlist.collaborative,

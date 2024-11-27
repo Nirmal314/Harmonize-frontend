@@ -23,13 +23,12 @@ const ToastManager = ({
       } else {
         router.push("/");
       }
-    } else {
-      const toastId = Number(sessionStorage.getItem("categorizingToastId"));
+    }
+    const toastId = Number(sessionStorage.getItem("categorizingToastId"));
 
-      if (toastId) {
-        toast.dismiss(toastId);
-        sessionStorage.removeItem("categorizingToastId");
-      }
+    if (toastId) {
+      toast.dismiss(toastId);
+      sessionStorage.removeItem("categorizingToastId");
     }
   }, [playlistId]);
 

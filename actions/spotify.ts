@@ -57,7 +57,7 @@ export const getPlaylists = async () => {
 
     return formattedPlaylists;
   } catch (error: any) {
-    if (typeof error === typeof Error) throw error;
+    console.error("Error while fetching playlists: ", error);
     throw new Error(handleSpotifyApiError(error));
   }
 };
@@ -100,6 +100,13 @@ export const getPlaylistData = async (playlistId: string) => {
         response.body.items as SpotifyApi.PlaylistTrackObject[]
       );
       offset += limit;
+    }
+
+    if (tracks.length <= 0) {
+      return {
+        playlistName: playlist.body.name,
+        songs: [],
+      };
     }
 
     const audioFeatures = await fetchAudioFeatures(tracks);
