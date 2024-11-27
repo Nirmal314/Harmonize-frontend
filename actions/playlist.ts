@@ -32,7 +32,9 @@ export const unfollowPlaylist = async (
       message: `Playlist ${playlistName} with ${totalTracks} tracks has been unfollowed.`,
     };
   } catch (error) {
-    console.error("Error while deleting playlist: ", error);
-    throw new Error("Error while deleting playlist");
+    console.error("Error while unfollowing playlist: ", error);
+    throw new Error(
+      `Something went wrong while unfollowing playlist: ${playlistName}`
+    );
   }
 };
