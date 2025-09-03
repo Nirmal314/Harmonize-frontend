@@ -1,36 +1,38 @@
 "use client";
 
-import React, { useTransition, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 import Sparkles from "../Sparkles";
 import { toast } from "sonner";
 import { Wand2 } from "lucide-react";
 import GlowingSparkle from "../GlowingSparkle";
 
 const Categorize = ({ playlistId }: { playlistId: string }) => {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  const navigateToCategorizedPage = useCallback(() => {
-    const toastId = toast.loading("Categorizing your playlist...✨", {
-      duration: Infinity,
-    });
-
-    startTransition(() => {
-      const params = new URLSearchParams();
-      params.set("playlistId", playlistId);
-      router.push(`/categorized-songs?${params.toString()}`);
-
-      sessionStorage.setItem("categorizingToastId", toastId as string);
-    });
-  }, [playlistId, router]);
 
   return (
     <>
       <div className="relative w-full">
         <button
-          onClick={navigateToCategorizedPage}
-          disabled={isPending}
+          onClick={() => 
+            toast.error(
+              <div>
+                Unable to categorize the playlist — Spotify deprecated the API endpoint
+                that provided the songs' audio features :(
+                <br />
+                <br />
+                <a
+                  href="https://developer.spotify.com/documentation/web-api/reference/get-audio-features"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  https://developer.spotify.com/documentation/web-api/reference/get-audio-features
+                </a>
+              </div>,
+              {
+                duration: Infinity,
+              }
+            )
+          }
           className="sparkle-button flex justify-center items-center h-9 px-4 py-2 bg-[#9333ea] hover:bg-transparent shadow-purple"
         >
           <Wand2 className={`w-4 h-4 text-white`} />
