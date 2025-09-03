@@ -5,6 +5,7 @@ import Provider from "./(components)/Provider";
 import { Toaster } from "sonner";
 import BetterHeader from "./(components)/Header/BetterHeader";
 import ScrollToTop from "./(components)/Buttons/ScrollToTop";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -55,6 +56,7 @@ export default function RootLayout({
               <ScrollToTop />
             </div> */}
           </main>
+          <Analytics />
         </Provider>
       </body>
     </html>
